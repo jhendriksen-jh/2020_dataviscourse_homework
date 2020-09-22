@@ -98,15 +98,20 @@ function update(data) {
   // TODO: Select and update the 'a' bar chart bars
 
   let groupA = d3.select("#aBarChart");
+  let barsRemove = groupA.selectAll("rect");
+  barsRemove.remove();
+
   let barsA = groupA.selectAll("rect").data(data);
 
-  
+  console.log(barsA)
   barsA.exit().remove();
-  barsA = barsA.enter().append("rect")
-  .merge(barsA);
+  barsA = barsA.enter()
+    .append("rect")
+    .merge(barsA);
   barsA.attr("width", d => aScale(d.cases))
-  .attr("height",12)
-  // .attr("y", (d,i) => i)
+    .attr("height",12)
+    .attr("y", (d,i) => i*14)
+    .attr("transform", "scale(-1,1)")
 
   // TODO: Select and update the 'b' bar chart bars
 
@@ -114,15 +119,12 @@ function update(data) {
   let barsB = groupB.selectAll("rect").data(data);
   
   barsB.exit().remove();
-  barsB = barsB.enter().append("rect")
-  .merge(barsB);
+  barsB = barsB.enter()
+    .append("rect")
+    .merge(barsB);
   barsB.attr("width", d => bScale(d.deaths))
   .attr("height", 12)
-  .attr("y", (d,i) => i*14);
-  barsB.on("hover",(d,i,g) => {
-    d3.select(g[i]).style("fill","yellow")
-  })
-  
+  .attr("y", (d,i) => i*14);  
 
   // TODO: Select and update the 'a' line chart path using this line generator
   let aLineGenerator = d3
@@ -152,7 +154,10 @@ function update(data) {
 
   // TODO: Select and update the 'b' area chart path (create your own generator)
 
-  let bAreaGenerator = d3.area().x((d,i) => iScale_area(i)).y0(0).y1(d => bScale(d.deaths));
+  let bAreaGenerator = d3.area()
+    .x((d,i) => iScale_area(i))
+    .y0(0)
+    .y1(d => bScale(d.deaths));
   
   let areaB = d3.select("#bAreaChart");
   areaB.datum(data).attr("d",bAreaGenerator);
@@ -170,7 +175,10 @@ function update(data) {
 
   scatterP.exit().remove();
   scatterP = scatterP.enter().append("circle").merge(scatterP)
-  scatterP.attr("cx",d => aScale(d.cases)).attr("cy", d => bScale(d.deaths)).attr("r",5).attr("transform","translate(180,10)");
+  scatterP.attr("cx",d => aScale(d.cases))
+    .attr("cy", d => bScale(d.deaths))
+    .attr("r",5)
+    .attr("transform","translate(180,10)");
     
   // ****** TODO: PART IV ******
 
@@ -198,7 +206,7 @@ function update(data) {
     d3.select(g[i]).classed("hovered",false);
   })
   scatterP.on("click",(d,i,g) =>{
-    function lab() {return "("+d.cases+","+d.deaths+")\nCases: "+d.cases + " Deaths: " +d.deaths};
+    function lab() {return "("+d.cases+","+d.deaths+")\nCases:"+d.cases + " Deaths:" +d.deaths};
     console.log(lab());
   })
 }

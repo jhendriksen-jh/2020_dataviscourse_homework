@@ -97,12 +97,16 @@ function update(data) {
 
   // TODO: Select and update the 'a' bar chart bars
 
-    let groupA = d3.select("#aBarChart");
-    let barsA = groupA.selectAll("rect").data(data);
+  let groupA = d3.select("#aBarChart");
+  let barsA = groupA.selectAll("rect").data(data);
+
   
-    barsA.exit().remove();
-    barsA = barsA.enter().append("rect").merge(barsA);
-    barsA.attr("width", d => aScale(d.cases))
+  barsA.exit().remove();
+  barsA = barsA.enter().append("rect")
+  .merge(barsA);
+  barsA.attr("width", d => aScale(d.cases))
+  .attr("height",12)
+  .attr("y", (d,i) => i)
   
   
   // TODO: Select and update the 'b' bar chart bars
@@ -125,7 +129,15 @@ function update(data) {
     .x((d, i) => iScale_line(i))
     .y(d => aScale(d.cases));
 
+    let lineA = d3.select("#aLineChart");
+    lineA.datum(data).attr("d",aLineGenerator);
+
   // TODO: Select and update the 'b' line chart path (create your own generator)
+
+  let bLineGenerator = d3.line().x((d,i) => iScale_line(i)).y(d => bScale(d.deaths));
+    
+    let lineB = d3.select("#bLineChart");
+    lineB.datum(data).attr("d",bLineGenerator);
 
   // TODO: Select and update the 'a' area chart path using this area generator
   let aAreaGenerator = d3
@@ -134,9 +146,29 @@ function update(data) {
     .y0(0)
     .y1(d => aScale(d.cases));
 
+    let areaA = d3.select("#aAreaChart");
+    areaA.datum(data).attr("d",aAreaGenerator);
+
   // TODO: Select and update the 'b' area chart path (create your own generator)
 
+  let bAreaGenerator = d3.area().x((d,i) => iScale_area(i)).y0(0).y1(d => bScale(d.deaths));
+  
+  let areaB = d3.select("#bAreaChart");
+  areaB.datum(data).attr("d",bAreaGenerator);
+
   // TODO: Select and update the scatterplot points
+  
+  let bAxis_Scatter = d3.axisLeft(bScale).ticks(5);
+  let aAxis_Scatter = d3.axisBottom(aScale).ticks(5);
+  d3.select("#y-axis").call(bAxis_Scatter);
+  d3.select("#x-axis").call(aAxis_Scatter);
+
+  let scatterPlotSvg = d3.select(".scatter-plot");
+  let scatterP = scatterPlotSvg.selectAll("circle").data(data)
+
+  scatterP.exit().remove();
+  scatterP = scatterP.enter().append("circle").merge(scatterP)
+  scatterP.attr("cx",d => aScale(d.cases)).attr("cy", d => bScale(d.deaths)).attr("r",5).attr("transform","translate(180,10)")
   
   // ****** TODO: PART IV ******
 }

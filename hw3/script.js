@@ -106,9 +106,8 @@ function update(data) {
   .merge(barsA);
   barsA.attr("width", d => aScale(d.cases))
   .attr("height",12)
-  .attr("y", (d,i) => i)
-  
-  
+  // .attr("y", (d,i) => i)
+
   // TODO: Select and update the 'b' bar chart bars
 
   let groupB = d3.select("#bBarChart");
@@ -120,8 +119,10 @@ function update(data) {
   barsB.attr("width", d => bScale(d.deaths))
   .attr("height", 12)
   .attr("y", (d,i) => i*14);
-
-
+  barsB.on("hover",(d,i,g) => {
+    d3.select(g[i]).style("fill","yellow")
+  })
+  
 
   // TODO: Select and update the 'a' line chart path using this line generator
   let aLineGenerator = d3
@@ -158,19 +159,48 @@ function update(data) {
 
   // TODO: Select and update the scatterplot points
   
+  //  drawing axes for the scatter plot
   let bAxis_Scatter = d3.axisLeft(bScale).ticks(5);
   let aAxis_Scatter = d3.axisBottom(aScale).ticks(5);
   d3.select("#y-axis").call(bAxis_Scatter);
   d3.select("#x-axis").call(aAxis_Scatter);
-
+  // add in the circles for data points 
   let scatterPlotSvg = d3.select(".scatter-plot");
   let scatterP = scatterPlotSvg.selectAll("circle").data(data)
 
   scatterP.exit().remove();
   scatterP = scatterP.enter().append("circle").merge(scatterP)
-  scatterP.attr("cx",d => aScale(d.cases)).attr("cy", d => bScale(d.deaths)).attr("r",5).attr("transform","translate(180,10)")
-  
+  scatterP.attr("cx",d => aScale(d.cases)).attr("cy", d => bScale(d.deaths)).attr("r",5).attr("transform","translate(180,10)");
+    
   // ****** TODO: PART IV ******
+
+  // For barchart A
+  barsA.on("mouseover",(d,i,g) =>{
+    d3.select(g[i]).classed("hovered",true);
+  })
+  barsA.on("mouseout",(d,i,g) =>{
+    d3.select(g[i]).classed("hovered",false);
+  })
+
+  // For barchart B
+  barsB.on("mouseover",(d,i,g) =>{
+    d3.select(g[i]).classed("hovered",true);
+  })
+  barsB.on("mouseout",(d,i,g) =>{
+    d3.select(g[i]).classed("hovered",false);
+  })
+
+  // For the scatter plot
+  scatterP.on("mouseover",(d,i,g) =>{
+    d3.select(g[i]).classed("hovered",true);
+  })
+  scatterP.on("mouseout",(d,i,g) =>{
+    d3.select(g[i]).classed("hovered",false);
+  })
+  scatterP.on("click",(d,i,g) =>{
+    function lab() {return "("+d.cases+","+d.deaths+")\nCases: "+d.cases + " Deaths: " +d.deaths};
+    console.log(lab());
+  })
 }
 
 /**

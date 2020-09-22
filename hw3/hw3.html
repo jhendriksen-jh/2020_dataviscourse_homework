@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <title>Homework 3</title>
+    <script src = "script.js"> </script>
     <style>
       /* style div and headers */
       div,
@@ -78,26 +79,27 @@
         grid-template-columns: 1fr 1fr;
       }
     </style>
+    
   </head>
 
   <body>
     <h3>CS-5630 / CS-6630 Homework 3</h3>
     <address>
-      <span>Your Name</span>
-      <span>Your Email</span>
-      <span>Your UID</span>
+      <span>Jordan Hendriksen - </span>
+      <span>jordan.hendriksen@utah.edu</span>
+      <span> - u1063288</span>
     </address>
     <br />
     <hr />
     <br />
 
     <span>
-      <button>Staircase</button>
+      <button onclick = "staircase()">Staircase</button>
     </span>
 
     <span>
       <label>Dataset:</label>
-      <select id="dataset">
+      <select id="dataset" onchange = "dataChange()">
         <option value="covid_us">The US</option>
         <option selected value="covid_utah">Utah</option>
         <option value="covid_ca">California</option>
@@ -105,7 +107,7 @@
       </select>
     </span>
 
-    <span> <input type="checkbox" id="random" /> Random Subset </span>
+    <span> <input type="checkbox" id="random" onchange = "changeData()"/> Random Subset </span>
 
     <br />
 

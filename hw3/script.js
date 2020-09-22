@@ -3,9 +3,33 @@
  *
  * Note: use only the DOM API, not D3!
  */
+
 function staircase() {
   // ****** TODO: PART II ******
+  document.getElementById("aBarChart");
+  let chartRects = aBarChart.getElementsByTagName("rect");
+  
+  let currentWidth = [];
+  let newWidth = [];
 
+  for(let i = 0; i < chartRects.length; i++){
+    currentWidth[i] = chartRects[i].getAttribute("width");
+  }
+
+  for(i = 0; i < chartRects.length; i++){
+    newWidth[i] = Math.max(...currentWidth);
+    for(j = 0; j < chartRects.length; j++){
+      if(currentWidth[j] == newWidth[i]){
+        currentWidth[j] = "0";
+      }
+    }
+  }
+  
+  for(let i = 0; i < chartRects.length; i++){
+    chartRects[i].setAttribute("width",newWidth[(chartRects.length-1)-i]);
+  }
+  
+  return
 }
 
 /**

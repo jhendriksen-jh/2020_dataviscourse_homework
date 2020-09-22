@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <title>Homework 3</title>
     <script src = "script.js"> </script>
+    <script src = "https://d3js.org/d3.v5.js"> </script>
     <style>
       /* style div and headers */
       div,
@@ -99,7 +100,7 @@
 
     <span>
       <label>Dataset:</label>
-      <select id="dataset" onchange = "dataChange()">
+      <select id="dataset" onchange = "changeData()">
         <option value="covid_us">The US</option>
         <option selected value="covid_utah">Utah</option>
         <option value="covid_ca">California</option>

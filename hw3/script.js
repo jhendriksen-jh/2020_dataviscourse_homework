@@ -7,28 +7,33 @@
 function staircase() {
   // ****** TODO: PART II ******
   document.getElementById("aBarChart");
-  let chartRects = aBarChart.getElementsByTagName("rect");
-  
-  let currentWidth = [];
-  let newWidth = [];
+  document.getElementById("bBarChart");
+  let chartRectsA = aBarChart.getElementsByTagName("rect");
+  let chartRectsB = bBarChart.getElementsByTagName("rect");
+  let currentWidthA = [];
+  let currentWidthB = [];
+  let newWidthA = [];
+  let newWidthB = [];
 
-  for(let i = 0; i < chartRects.length; i++){
-    currentWidth[i] = chartRects[i].getAttribute("width");
+  for(let i = 0; i < chartRectsA.length; i++){
+    currentWidthA[i] = chartRectsA[i].getAttribute("width");
+    currentWidthB[i] = chartRectsB[i].getAttribute("width");
   }
 
-  for(i = 0; i < chartRects.length; i++){
-    newWidth[i] = Math.max(...currentWidth);
-    for(j = 0; j < chartRects.length; j++){
-      if(currentWidth[j] == newWidth[i]){
-        currentWidth[j] = "0";
+  for(i = 0; i < chartRectsA.length; i++){
+    newWidthA[i] = Math.max(...currentWidthA);
+    for(j = 0; j < chartRectsA.length; j++){
+      if(currentWidthA[j] == newWidthA[i]){
+        currentWidthA[j] = "0";
+        newWidthB[i] = currentWidthB[j];
       }
     }
   }
-  
-  for(let i = 0; i < chartRects.length; i++){
-    chartRects[i].setAttribute("width",newWidth[(chartRects.length-1)-i]);
+
+  for(let i = 0; i < chartRectsA.length; i++){
+    chartRectsA[i].setAttribute("width",newWidthA[(chartRectsA.length-1)-i]);
+    chartRectsB[i].setAttribute("width",newWidthB[(chartRectsB.length-1)-i]);
   }
-  
   return
 }
 
@@ -92,7 +97,27 @@ function update(data) {
 
   // TODO: Select and update the 'a' bar chart bars
 
+    let groupA = d3.select("#aBarChart");
+    let barsA = groupA.selectAll("rect").data(data);
+  
+    barsA.exit().remove();
+    barsA = barsA.enter().append("rect").merge(barsA);
+    barsA.attr("width", d => aScale(d.cases))
+  
+  
   // TODO: Select and update the 'b' bar chart bars
+
+  let groupB = d3.select("#bBarChart");
+  let barsB = groupB.selectAll("rect").data(data);
+  
+  barsB.exit().remove();
+  barsB = barsB.enter().append("rect")
+  .merge(barsB);
+  barsB.attr("width", d => bScale(d.deaths))
+  .attr("height", 12)
+  .attr("y", (d,i) => i*14);
+
+
 
   // TODO: Select and update the 'a' line chart path using this line generator
   let aLineGenerator = d3

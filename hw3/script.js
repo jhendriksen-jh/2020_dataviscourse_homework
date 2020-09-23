@@ -1,3 +1,4 @@
+
 /**
  * Makes the first bar chart appear as a staircase.
  *
@@ -6,34 +7,61 @@
 
 function staircase() {
   // ****** TODO: PART II ******
+  
   document.getElementById("aBarChart");
-  document.getElementById("bBarChart");
+  // initialize variables needed
   let chartRectsA = aBarChart.getElementsByTagName("rect");
-  let chartRectsB = bBarChart.getElementsByTagName("rect");
   let currentWidthA = [];
-  let currentWidthB = [];
+  let currentWidthSort = [];
   let newWidthA = [];
-  let newWidthB = [];
 
+  // find the current widths of the bars in both charts (bars from A are used in sorting)
   for(let i = 0; i < chartRectsA.length; i++){
     currentWidthA[i] = chartRectsA[i].getAttribute("width");
-    currentWidthB[i] = chartRectsB[i].getAttribute("width");
+    currentWidthSort[i] = chartRectsA[i].getAttribute("width");
   }
-
+  // sort the width of the bars in A from gratest to least
+  // using the index of where the largest was bars in B are sorted so that dates continue to match
   for(i = 0; i < chartRectsA.length; i++){
     newWidthA[i] = Math.max(...currentWidthA);
     for(j = 0; j < chartRectsA.length; j++){
       if(currentWidthA[j] == newWidthA[i]){
         currentWidthA[j] = "0";
-        newWidthB[i] = currentWidthB[j];
       }
     }
   }
-
+  // reassign then width of the bars so widest is on the bottom 
   for(let i = 0; i < chartRectsA.length; i++){
     chartRectsA[i].setAttribute("width",newWidthA[(chartRectsA.length-1)-i]);
-    chartRectsB[i].setAttribute("width",newWidthB[(chartRectsB.length-1)-i]);
   }
+  //  if there is a second barchart
+    document.getElementById("bBarChart");
+    // initialize variables needed
+    let chartRectsB = bBarChart.getElementsByTagName("rect");
+    let currentWidthB = [];
+    let newWidthB = [];
+    
+    // find the current widths of the bars in chartB (bars from A are used in sorting)
+    if(chartRectsB.length > 0){
+      for(let i = 0; i < chartRectsA.length; i++){
+        currentWidthB[i] = chartRectsB[i].getAttribute("width");
+      }
+      // sort the width of the bars in A from gratest to least
+      // using the index of where the largest was bars in B are sorted so that dates continue to match
+      for(i = 0; i < chartRectsA.length; i++){
+        newWidthA[i] = Math.max(...currentWidthSort);
+        for(j = 0; j < chartRectsA.length; j++){
+          if(currentWidthSort[j] == newWidthA[i]){
+            currentWidthSort[j] = "0";
+            newWidthB[i] = currentWidthB[j];
+          }
+        }
+      }
+      // reassign then width of the bars so widest is on the bottom 
+      for(let i = 0; i < chartRectsA.length; i++){
+        chartRectsB[i].setAttribute("width",newWidthB[(chartRectsB.length-1)-i]);
+      }
+    }
   return
 }
 
@@ -103,28 +131,45 @@ function update(data) {
 
   let barsA = groupA.selectAll("rect").data(data);
 
-  console.log(barsA)
-  barsA.exit().remove();
+  barsA.exit()
+    .attr("opacity",1)
+    .transition()
+    .duration(1000)
+    .attr("opacity",0)
+    .remove();
+    
   barsA = barsA.enter()
     .append("rect")
     .merge(barsA);
-  barsA.attr("width", d => aScale(d.cases))
-    .attr("height",12)
+  barsA.attr("height",12)
     .attr("y", (d,i) => i*14)
     .attr("transform", "scale(-1,1)")
+    .transition()
+    .duration(1250)
+    .attr("width", d => aScale(d.cases))
 
   // TODO: Select and update the 'b' bar chart bars
 
   let groupB = d3.select("#bBarChart");
   let barsB = groupB.selectAll("rect").data(data);
   
-  barsB.exit().remove();
+  barsB.exit()
+    .attr("opacity",1)
+    .transition()
+    .duration(1000)
+    .attr("opacity",0)
+    .attr("width",0)
+    .remove();
+
   barsB = barsB.enter()
     .append("rect")
     .merge(barsB);
-  barsB.attr("width", d => bScale(d.deaths))
-  .attr("height", 12)
-  .attr("y", (d,i) => i*14);  
+  barsB.attr("height", 12)
+    .attr("y", (d,i) => i*14)
+    .transition()
+    .duration(1250)
+    .attr("width", d => bScale(d.deaths));
+     
 
   // TODO: Select and update the 'a' line chart path using this line generator
   let aLineGenerator = d3
@@ -133,14 +178,20 @@ function update(data) {
     .y(d => aScale(d.cases));
 
     let lineA = d3.select("#aLineChart");
-    lineA.datum(data).attr("d",aLineGenerator);
+    lineA.datum(data)
+      .transition()
+      .duration(750)
+      .attr("d",aLineGenerator);
 
   // TODO: Select and update the 'b' line chart path (create your own generator)
 
   let bLineGenerator = d3.line().x((d,i) => iScale_line(i)).y(d => bScale(d.deaths));
     
     let lineB = d3.select("#bLineChart");
-    lineB.datum(data).attr("d",bLineGenerator);
+    lineB.datum(data)
+      .transition()
+      .duration(750)
+      .attr("d",bLineGenerator);
 
   // TODO: Select and update the 'a' area chart path using this area generator
   let aAreaGenerator = d3
@@ -150,7 +201,10 @@ function update(data) {
     .y1(d => aScale(d.cases));
 
     let areaA = d3.select("#aAreaChart");
-    areaA.datum(data).attr("d",aAreaGenerator);
+    areaA.datum(data)
+      .transition()
+      .duration(750)
+      .attr("d",aAreaGenerator);
 
   // TODO: Select and update the 'b' area chart path (create your own generator)
 
@@ -160,7 +214,10 @@ function update(data) {
     .y1(d => bScale(d.deaths));
   
   let areaB = d3.select("#bAreaChart");
-  areaB.datum(data).attr("d",bAreaGenerator);
+  areaB.datum(data)
+    .transition()
+    .duration(750)
+    .attr("d",bAreaGenerator);
 
   // TODO: Select and update the scatterplot points
   
@@ -171,24 +228,43 @@ function update(data) {
   d3.select("#x-axis").call(aAxis_Scatter);
   // add in the circles for data points 
   let scatterPlotSvg = d3.select(".scatter-plot");
-  let scatterP = scatterPlotSvg.selectAll("circle").data(data)
+  let scatterP = scatterPlotSvg.selectAll("circle").data(data);
+  // let scatterL = scatterPlotSvg.selectAll("title").data(data);
+  
+  // scatterL.exit().remove();
+  // scatterL = scatterL.enter().append("div").merge(scatterL)
+  // scatterL.attr("class", "label")
+  //   .style("opacity",1)
+  
+  let tooltip = d3.select("#scatterDiv")
+    .append("div")
+    .style("opacity", 0)
+    .attr("class", "tooltip")
+    .style("background-color", "black")
+    .style("border", "solid")
+    .style("border-width", "1px")
+    .style("border-radius", "5px")
+    .style("padding", "10px")
 
-  scatterP.exit().remove();
+  scatterP.exit()
+    .attr("opacity",1)
+    .transition()
+    .duration(750)
+    .attr("opacity",0)
+    .remove();
+
   scatterP = scatterP.enter().append("circle").merge(scatterP)
-  scatterP.attr("cx",d => aScale(d.cases))
+  scatterP.attr("transform","translate(180,10)")
+    .transition()
+    .duration(1250)
+    .attr("cx",d => aScale(d.cases))
     .attr("cy", d => bScale(d.deaths))
     .attr("r",5)
-    .attr("transform","translate(180,10)");
     
   // ****** TODO: PART IV ******
 
   // For barchart A
-  barsA.on("mouseover",(d,i,g) =>{
-    d3.select(g[i]).classed("hovered",true);
-  })
-  barsA.on("mouseout",(d,i,g) =>{
-    d3.select(g[i]).classed("hovered",false);
-  })
+    // barchart A is handled with calling barHover() on page loading
 
   // For barchart B
   barsB.on("mouseover",(d,i,g) =>{
@@ -201,15 +277,36 @@ function update(data) {
   // For the scatter plot
   scatterP.on("mouseover",(d,i,g) =>{
     d3.select(g[i]).classed("hovered",true);
+    tooltip.style("opacity",1)
+      .style("left", d[i].cases+"px")
+      .style("top",d[i].deaths+"px")
+  })
+  scatterP.on("mousemove",(d) => {
+    tooltip.style("left", d[i].cases+"px")
+      .style("top",d[i].deaths+"px")
   })
   scatterP.on("mouseout",(d,i,g) =>{
     d3.select(g[i]).classed("hovered",false);
+    tooltip.style("opacity",0)
   })
   scatterP.on("click",(d,i,g) =>{
     function lab() {return "("+d.cases+","+d.deaths+")\nCases:"+d.cases + " Deaths:" +d.deaths};
     console.log(lab());
   })
 }
+
+function barHover(){
+  // This function exists only so that the hover color change works for the initial bar chart before data is changed
+   let groupA = d3.select("#aBarChart");
+   let barsA = groupA.selectAll("rect");
+   barsA.on("mouseover",(d,i,g) =>{
+     d3.select(g[i]).classed("hovered",true);
+   })
+   barsA.on("mouseout",(d,i,g) =>{
+     d3.select(g[i]).classed("hovered",false);
+   })
+}
+
 
 /**
  * Update the data according to document settings

@@ -228,24 +228,18 @@ function update(data) {
   d3.select("#x-axis").call(aAxis_Scatter);
   // add in the circles for data points 
   let scatterPlotSvg = d3.select(".scatter-plot");
-  let scatterP = scatterPlotSvg.selectAll("circle").data(data);
-  // let scatterL = scatterPlotSvg.selectAll("title").data(data);
+  let scatterP = scatterPlotSvg.select(".labels").selectAll("g").data(data);
   
-  // scatterL.exit().remove();
-  // scatterL = scatterL.enter().append("div").merge(scatterL)
-  // scatterL.attr("class", "label")
-  //   .style("opacity",1)
+  let groupCircle = scatterP.selectAll("circle");
+  groupCircle.attr("opacity",1)
+    .transition()
+    .duration(750)
+    .attr("opacity",0)
+    .remove();
+  let groupTitle = scatterP.selectAll("title");
+  groupTitle.remove();
   
-  let tooltip = d3.select("#scatterDiv")
-    .append("div")
-    .style("opacity", 0)
-    .attr("class", "tooltip")
-    .style("background-color", "black")
-    .style("border", "solid")
-    .style("border-width", "1px")
-    .style("border-radius", "5px")
-    .style("padding", "10px")
-
+  
   scatterP.exit()
     .attr("opacity",1)
     .transition()
@@ -253,19 +247,37 @@ function update(data) {
     .attr("opacity",0)
     .remove();
 
-  scatterP = scatterP.enter().append("circle").merge(scatterP)
-  scatterP.attr("transform","translate(180,10)")
+
+  scatterP = scatterP.enter().append("g").merge(scatterP)
+  scatterP.append("circle")
     .transition()
     .duration(1250)
     .attr("cx",d => aScale(d.cases))
     .attr("cy", d => bScale(d.deaths))
     .attr("r",5)
-    
+  scatterP.append("title")
+      .text((d)=>{
+        return d.date+": ("+d.cases+","+d.deaths+")"
+      })
+
+  // prior attempt at creating vanishing data labels
+
+      // scatterPlotSvg.append("g").attr("class","labels");
+      // labels = scatterPlotSvg.select(".labels").selectAll("text").data(data)
+      // // labels.exit().remove()
+      // labels.enter().append("text").text((d) => d.date)
+      //   .attr("transform","translate(180,10)")
+      //   .attr("x", d=> aScale(d.cases))
+      //   .attr("y", d => bScale(d.deaths))
+      //   .attr("class","dataLabel")
+      //   .style("opacity",0)
+
+
   // ****** TODO: PART IV ******
 
   // For barchart A
-    // barchart A is handled with calling barHover() on page loading
-
+    // barchart A is handled with calling barHover() 
+      barHover();
   // For barchart B
   barsB.on("mouseover",(d,i,g) =>{
     d3.select(g[i]).classed("hovered",true);
@@ -275,20 +287,7 @@ function update(data) {
   })
 
   // For the scatter plot
-  scatterP.on("mouseover",(d,i,g) =>{
-    d3.select(g[i]).classed("hovered",true);
-    tooltip.style("opacity",1)
-      .style("left", d[i].cases+"px")
-      .style("top",d[i].deaths+"px")
-  })
-  scatterP.on("mousemove",(d) => {
-    tooltip.style("left", d[i].cases+"px")
-      .style("top",d[i].deaths+"px")
-  })
-  scatterP.on("mouseout",(d,i,g) =>{
-    d3.select(g[i]).classed("hovered",false);
-    tooltip.style("opacity",0)
-  })
+
   scatterP.on("click",(d,i,g) =>{
     function lab() {return "("+d.cases+","+d.deaths+")\nCases:"+d.cases + " Deaths:" +d.deaths};
     console.log(lab());

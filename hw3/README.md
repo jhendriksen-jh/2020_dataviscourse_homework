@@ -100,9 +100,9 @@ D3 makes transitions very simple; for extra credit, animate each D3 transition (
 
 ## Demo
 
-Here is a demo of how the interactions could look like. You can also check out a higher resolution version [here](figures/hw3_demo.mp4).
+Here is a demo of how the interactions could look like. You can also check out a higher resolution version [here](figures/hw3_demo_2.mp4).
 
-![Animated Result](figures/hw3_demo.gif)
+![Animated Result](figures/hw3_demo_2.gif)
 
 
 ## Grading

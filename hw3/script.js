@@ -126,8 +126,6 @@ function update(data) {
   // TODO: Select and update the 'a' bar chart bars
 
   let groupA = d3.select("#aBarChart");
-  let barsRemove = groupA.selectAll("rect");
-  barsRemove.remove();
 
   let barsA = groupA.selectAll("rect").data(data);
 

@@ -51,8 +51,9 @@ class GapPlot {
         this.data = data;
 
         //TODO - your code goes here -
-
-
+        this.drawPlot(data);
+        this.updatePlot(this.activeYear,"gdp","population","gdp");
+        this.drawYearBar(updateYear);
         // ******* TODO: PART 3 *******
         /**
          For part 4 of the homework, you will be using the other 3 parameters.
@@ -104,9 +105,14 @@ class GapPlot {
         let svgGroup = d3.select('#chart-view').select('.plot-svg').append('g').classed('wrapper-group', true);
 
 
-        //TODO - your code goes here
+        //TODO - your code goes here 
 
+        // let yAxis = d3.axisLeft(d3.scaleLinear().domain([0,100]).range([0.100])).ticks(10);
+        // let xAxis = d3.axisBottom(d3.scaleLinear().domain([0,100]).range([0.100])).ticks(10);
 
+        svgGroup.append("g").attr("id","y-axis").attr("class","axis");
+        svgGroup.append("g").attr("id","x-axis").attr("class","axis");
+        
         /* Below is the setup for the dropdown menu- no need to change this */
 
         let dropdownWrap = d3.select('#chart-view').append('div').classed('dropdown-wrapper', true);
@@ -159,7 +165,7 @@ class GapPlot {
         // ******* TODO: PART 2 *******
         /*
         You will be updating the scatterplot from the data. hint: use the #chart-view div
-
+        
         *** Structuring your PlotData objects ***
         You need to start by mapping the data specified by the parameters to the PlotData Object
         Your PlotData object is specified at the top of the file
@@ -195,11 +201,39 @@ class GapPlot {
          * @returns {number} the radius
          */
         let circleSizer = function (d) {
+            let minSize = d3.min(d);
+            let maxSize = d3.max(d);
             let cScale = d3.scaleSqrt().range([3, 20]).domain([minSize, maxSize]);
             return d.circleSize ? cScale(d.circleSize) : 3;
         };
 
         //TODO - your code goes here -
+
+        this.drawDropDown();
+        this.drawLegend();
+
+        let plotDataArr = [];
+
+        for(let i = 0; i < this.data[""+xIndicator].length; i++){
+            let node = new PlotData(this.data[""+xIndicator][i].country,
+            this.data[""+xIndicator][i],
+            this.data[""+yIndicator][i],
+            this.data[""+xIndicator][i].geo,
+            "region",
+            circleSizer(this.data[""+circleSizeIndicator][i]));
+            plotDataArr.push(node);
+        }
+        // write another for loop to assign region using pop data or others
+        console.log(plotDataArr)
+
+        let yScale = d3.scaleLinear().domain([d3.min(this.data[yIndicator]),d3.max(this.data[yIndicator])]).range([0,this.height]);
+        let xScale = d3.scaleLinear().domain([d3.min(this.data[xIndicator]),d3.max(this.data[xIndicator])]).range([0,this.width]);
+        let yAxis = d3.axisLeft(yScale).ticks(10);
+        let xAxis = d3.axisBottom(xScale).ticks(10);
+        let h = this.height;
+        d3.select("#y-axis").call(yAxis).attr("transform","translate("+this.margin.left+",0)");
+        d3.select("#x-axis").call(xAxis).attr("transform","translate("+this.margin.left+","+h+")");
+
     }
 
     /**

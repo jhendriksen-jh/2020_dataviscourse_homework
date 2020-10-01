@@ -42,7 +42,7 @@ loadData().then(data => {
 
     // Initialize gapPlot here.
     //TODO - your code goes here -
-    gapPlot;
+    // gapPlot(data, updateCountry, updateYear, this.activeYear);
     
     // here we load the map data
     d3.json('data/world.json').then(mapData => {

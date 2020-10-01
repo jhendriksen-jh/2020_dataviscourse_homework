@@ -52,8 +52,9 @@ class GapPlot {
 
         //TODO - your code goes here -
         this.drawPlot(data);
-        this.updatePlot(this.activeYear,"gdp","population","gdp");
         this.drawYearBar(updateYear);
+        this.drawDropDown();
+        // this.updatePlot(this.activeYear,"population","population","population")
         // ******* TODO: PART 3 *******
         /**
          For part 4 of the homework, you will be using the other 3 parameters.
@@ -106,7 +107,8 @@ class GapPlot {
 
 
         //TODO - your code goes here 
-
+        
+       
         // let yAxis = d3.axisLeft(d3.scaleLinear().domain([0,100]).range([0.100])).ticks(10);
         // let xAxis = d3.axisBottom(d3.scaleLinear().domain([0,100]).range([0.100])).ticks(10);
 
@@ -201,39 +203,74 @@ class GapPlot {
          * @returns {number} the radius
          */
         let circleSizer = function (d) {
-            let minSize = d3.min(d);
-            let maxSize = d3.max(d);
+            // let minSize = d3.min(d);
+            // let maxSize = d3.max(d);
             let cScale = d3.scaleSqrt().range([3, 20]).domain([minSize, maxSize]);
             return d.circleSize ? cScale(d.circleSize) : 3;
         };
 
         //TODO - your code goes here -
 
-        this.drawDropDown();
         this.drawLegend();
 
         let plotDataArr = [];
 
+        let cValList = [];
+        for(let i = 0; i<this.data[""+circleSizeIndicator].length; i++){
+            cValList[i] = this.data[""+circleSizeIndicator][i][this.activeYear]; 
+        }
+        let minSize = d3.min(cValList);
+        let maxSize = d3.min(cValList);
+
         for(let i = 0; i < this.data[""+xIndicator].length; i++){
             let node = new PlotData(this.data[""+xIndicator][i].country,
-            this.data[""+xIndicator][i],
-            this.data[""+yIndicator][i],
+            this.data[""+xIndicator][i][this.activeYear],
+            this.data[""+yIndicator][i][this.activeYear],
             this.data[""+xIndicator][i].geo,
-            "region",
-            circleSizer(this.data[""+circleSizeIndicator][i]));
+            "countries",
+            this.data[""+circleSizeIndicator][i][this.activeYear]);
             plotDataArr.push(node);
         }
+        
         // write another for loop to assign region using pop data or others
+        for(let i = 0; i < plotDataArr.length; i++){
+            for(let k = 0; k < this.data["population"].length; k++){
+                if(plotDataArr[i].id === this.data["population"][k].geo){
+                    plotDataArr[i].region = this.data["population"][k].region;
+                } 
+            }
+        }
+        
         console.log(plotDataArr)
 
-        let yScale = d3.scaleLinear().domain([d3.min(this.data[yIndicator]),d3.max(this.data[yIndicator])]).range([0,this.height]);
-        let xScale = d3.scaleLinear().domain([d3.min(this.data[xIndicator]),d3.max(this.data[xIndicator])]).range([0,this.width]);
+        let xValList = []
+        for(let i = 0; i<plotDataArr.length; i++){
+            xValList[i] = plotDataArr[i].xVal; 
+        }
+        let yValList = []
+        for(let i = 0; i<plotDataArr.length; i++){
+            yValList[i] = plotDataArr[i].yVal; 
+        }
+
+        let yScale = d3.scaleLinear().domain([d3.min(yValList),d3.max(yValList)]).range([this.height,this.margin.bottom]);
+        let xScale = d3.scaleLinear().domain([d3.min(xValList),d3.max(xValList)]).range([0,this.width]);
         let yAxis = d3.axisLeft(yScale).ticks(10);
-        let xAxis = d3.axisBottom(xScale).ticks(10);
+        let xAxis = d3.axisBottom(xScale).ticks(6);
         let h = this.height;
         d3.select("#y-axis").call(yAxis).attr("transform","translate("+this.margin.left+",0)");
-        d3.select("#x-axis").call(xAxis).attr("transform","translate("+this.margin.left+","+h+")");
+        d3.select("#x-axis").call(xAxis).attr("transform","translate("+this.margin.left+","+this.height+")");
 
+        let chartSVG = d3.select(".plot-svg").selectAll("circle");
+        
+        chartSVG.data(plotDataArr)
+            .enter().append("circle").merge(chartSVG)
+            .attr("r",(d,i) => circleSizer(d.circleSize))
+            .attr("cx",(d,i) => xScale(d.xVal))
+            .attr("cy",(d,i) => yScale(d.yVal))
+            .attr("class", (d) => ""+d.region)
+            .attr("transform","translate("+this.margin.left+",0)");
+        chartSVG.data(plotDataArr)
+            .exit().remove();
     }
 
     /**
@@ -378,6 +415,10 @@ class GapPlot {
 
         yearSlider.on('input', function () {
             //TODO - your code goes here -
+            let year = this.value;
+            // updateYear(year);
+            console.log(year)
+            // that.updatePlot(this.activeYear, xValue, yValue, cValue);
         });
     }
 

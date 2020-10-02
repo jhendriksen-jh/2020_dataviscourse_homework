@@ -52,7 +52,7 @@ class GapPlot {
 
         //TODO - your code goes here -
         this.drawPlot(data);
-        this.drawYearBar(this.updateYear);
+        this.drawYearBar(updateYear);
         this.drawDropDown();
         // this.updatePlot(this.activeYear,"population","population","population")
         // ******* TODO: PART 3 *******
@@ -107,13 +107,24 @@ class GapPlot {
 
 
         //TODO - your code goes here 
-        
-       
-        // let yAxis = d3.axisLeft(d3.scaleLinear().domain([0,100]).range([0.100])).ticks(10);
-        // let xAxis = d3.axisBottom(d3.scaleLinear().domain([0,100]).range([0.100])).ticks(10);
 
         svgGroup.append("g").attr("id","y-axis").attr("class","axis");
         svgGroup.append("g").attr("id","x-axis").attr("class","axis");
+
+        d3.select(".plot-svg").append("text")
+            .classed("x-label",true)
+            .classed("axis-label",true)
+            .attr("text-anchor")
+            .attr("transform","translate("+(this.width + this.margin.left + this.margin.right)/2+","+(this.height+this.margin.bottom)+")")
+        
+        d3.select(".plot-svg").append("text")
+            .classed("y-label",true)
+            .classed("axis-label",true)
+            .attr("transform","translate("+this.margin.right/2+","+(this.height+this.margin.bottom+this.margin.top)/2+") rotate(-90)")
+
+        d3.select(".plot-svg").append("text")
+            .attr("class","activeYear-background")
+            .attr("transform","translate(100,150)")
         
         /* Below is the setup for the dropdown menu- no need to change this */
 
@@ -209,17 +220,33 @@ class GapPlot {
 
         //TODO - your code goes here -
 
-        this.drawLegend();
-
         let plotDataArr = [];
 
         let cValList = [];
         for(let i = 0; i<this.data[""+circleSizeIndicator].length; i++){
-            cValList[i] = this.data[""+circleSizeIndicator][i][this.activeYear]; 
+            for(let y = 1800; y < 2021; y++){
+                cValList[i] = this.data[""+circleSizeIndicator][i][y]; 
+            }
+        }
+
+        let xValList = [];
+        for(let i = 0; i < this.data[""+xIndicator].length; i++){
+            for(let y = 1800; y < 2021; y++){
+                xValList[i] = this.data[""+xIndicator][i][y]; 
+            }
+        }
+        
+        let yValList = [];
+        for(let i = 0; i < this.data[""+yIndicator].length; i++){
+            for(let y = 1800; y < 2021; y++){
+                yValList[i] = this.data[""+yIndicator][i][y];
+            } 
         }
 
         let minSize = Math.min.apply(null, cValList.filter(Boolean));
-        let maxSize = Math.max(cValList);
+        let maxSize = d3.max(cValList);
+
+        this.drawLegend(minSize,maxSize);
 
         // for(let i = 0; i < this.data[""+xIndicator].length; i++){
         //     let node = new PlotData(this.data[""+xIndicator][i].country,
@@ -274,16 +301,6 @@ class GapPlot {
             plotDataArr[i].circleSize = circleSizer(plotDataArr[i]);
         }
 
-        
-
-        let xValList = []
-        for(let i = 0; i<plotDataArr.length; i++){
-            xValList[i] = plotDataArr[i].xVal; 
-        }
-        let yValList = []
-        for(let i = 0; i<plotDataArr.length; i++){
-            yValList[i] = plotDataArr[i].yVal; 
-        }
         // create scales and axes
         let yScale = d3.scaleLinear().domain([d3.min(yValList),d3.max(yValList)]).range([this.height,this.margin.bottom]);
         let xScale = d3.scaleLinear().domain([d3.min(xValList),d3.max(xValList)]).range([0,this.width]);
@@ -293,22 +310,10 @@ class GapPlot {
         d3.select("#y-axis").call(yAxis).attr("transform","translate("+this.margin.left+",0)");
         d3.select("#x-axis").call(xAxis).attr("transform","translate("+this.margin.left+","+this.height+")");
         // labels and such
-        d3.select(".plot-svg").append("text")
-            .classed("x-label",true)
-            .classed("axis-label",true)
-            .attr("transform","translate("+(this.width + this.margin.left + this.margin.right)/2+","+(this.height+this.margin.bottom)+")")
-            .text(function() {return xIndicator});
-
-        d3.select(".plot-svg").append("text")
-            .classed("y-label",true)
-            .classed("axis-label",true)
-            .attr("transform","translate("+this.margin.right/2+","+(this.height+this.margin.bottom+this.margin.top)/2+") rotate(-90)")
-            .text(function() {return yIndicator});
-
-        d3.select(".plot-svg").append("text")
-            .attr("class","activeYear-background")
-            .attr("transform","translate(100,150)")
-            .text(function() {return activeYear});
+        
+        d3.select(".x-label").text(function() {return xIndicator});
+        d3.select(".y-label").text(function() {return yIndicator});
+        d3.select(".activeYear-background").text(function() {return activeYear});
 
         let chartSVG = d3.select(".plot-svg").selectAll("circle");
         
@@ -466,9 +471,15 @@ class GapPlot {
         yearSlider.on('input', function () {
             //TODO - your code goes here -
             let year = this.value;
-            that.updateYear(year);
-            console.log(year);
-            // that.updatePlot(this.activeYear, xValue, yValue, cValue);
+            updateYear = year;
+            // console.log(year);
+            let dropX = d3.select('.dropdown-wrapper').select('#dropdown_x').select('.dropdown-content').select('select');
+            let dropY = d3.select('.dropdown-wrapper').select('#dropdown_y').select('.dropdown-content').select('select');
+            let dropC = d3.select('.dropdown-wrapper').select('#dropdown_c').select('.dropdown-content').select('select');
+            let xValue = dropX.node().value;
+            let cValue = dropC.node().value;
+            let yValue = dropY.node().value;
+            that.updatePlot(this.activeYear, xValue, yValue, cValue);
         });
     }
 

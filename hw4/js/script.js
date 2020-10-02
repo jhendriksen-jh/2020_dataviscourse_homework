@@ -6,7 +6,7 @@ loadData().then(data => {
     this.activeYear = '2000';
     let that = this;
 
-    console.log(data)
+    // console.log(data)
 
     // ******* TODO: PART 3 *******
     /**
@@ -42,7 +42,7 @@ loadData().then(data => {
 
     // Initialize gapPlot here.
     //TODO - your code goes here -
-    // gapPlot(data, updateCountry, updateYear, this.activeYear);
+    gapPlot.updatePlot(this.activeYear,"population","population","population");
     
     // here we load the map data
     d3.json('data/world.json').then(mapData => {

@@ -50,6 +50,7 @@ class GapPlot {
 
         this.data = data;
         this.updateYear = updateYear;
+        this.updateCountry = updateCountry;
         //TODO - your code goes here -
         this.drawPlot(data);
         this.drawYearBar(updateYear);
@@ -226,21 +227,21 @@ class GapPlot {
         let cValList = [];
         for(let i = 0; i<this.data[""+circleSizeIndicator].length; i++){
             for(let y = 1800; y < 2021; y++){
-                cValList[i] = this.data[""+circleSizeIndicator][i][y]; 
+               cValList.push(this.data[""+circleSizeIndicator][i][y]); 
             }
         }
 
         let xValList = [];
         for(let i = 0; i < this.data[""+xIndicator].length; i++){
             for(let y = 1800; y < 2021; y++){
-                xValList[i] = this.data[""+xIndicator][i][y]; 
+                xValList.push(this.data[""+xIndicator][i][y]); 
             }
         }
-        
+
         let yValList = [];
         for(let i = 0; i < this.data[""+yIndicator].length; i++){
             for(let y = 1800; y < 2021; y++){
-                yValList[i] = this.data[""+yIndicator][i][y];
+                yValList.push(this.data[""+yIndicator][i][y]);
             } 
         }
 
@@ -249,15 +250,7 @@ class GapPlot {
 
         this.drawLegend(minSize,maxSize);
 
-        // for(let i = 0; i < this.data[""+xIndicator].length; i++){
-        //     let node = new PlotData(this.data[""+xIndicator][i].country,
-        //     this.data[""+xIndicator][i][this.activeYear],
-        //     "yVal",
-        //     this.data[""+xIndicator][i].geo,
-        //     "countries",
-        //     "circle");
-        //     plotDataArr.push(node);
-        // }
+        //assign plot data from this.data
 
         for(let i = 0; i < this.data[""+xIndicator].length; i++){
             for(let j = 0; j < this.data[""+yIndicator].length; j++){
@@ -278,15 +271,6 @@ class GapPlot {
             }
         }
 
-        // for(let i = 0; i < this.data[""+xIndicator].length; i++){
-        //     let node = new PlotData(this.data[""+xIndicator][i].country,
-        //     this.data[""+xIndicator][i][this.activeYear],
-        //     this.data[""+yIndicator][i][this.activeYear],
-        //     this.data[""+xIndicator][i].geo,
-        //     "countries",
-        //     this.data[""+circleSizeIndicator][i][this.activeYear]);
-        //     plotDataArr.push(node);
-        // }
         
         // write another for loop to assign region using pop data or others
         for(let i = 0; i < plotDataArr.length; i++){
@@ -303,8 +287,9 @@ class GapPlot {
         }
 
         // create scales and axes
-        let yScale = d3.scaleLinear().domain([d3.min(yValList),d3.max(yValList)]).range([this.height,this.margin.bottom]);
-        let xScale = d3.scaleLinear().domain([d3.min(xValList),d3.max(xValList)]).range([0,this.width]);
+        let yScale = d3.scaleLinear().domain([0,d3.max(yValList)]).range([this.height,this.margin.bottom]);
+        let xScale = d3.scaleLinear().domain([0,d3.max(xValList)]).range([0,this.width]);
+
         let yAxis = d3.axisLeft(yScale).ticks(10);
         let xAxis = d3.axisBottom(xScale).ticks(6);
        
@@ -327,6 +312,14 @@ class GapPlot {
             .attr("transform","translate("+this.margin.left+",0)");
         chartSVG.data(plotDataArr)
             .exit().remove();
+
+        let selctedCircle = d3.select(".plot-svg").selectAll("circle").data(plotDataArr);
+
+        let that = this;
+
+        selctedCircle.on("click", function(d){
+            that.updateCountry(d);
+        })
     }
 
     /**
@@ -481,6 +474,8 @@ class GapPlot {
             let cValue = dropC.node().value;
             let yValue = dropY.node().value;
             that.updatePlot(year, xValue, yValue, cValue);
+            sliderText.attr("x",yearScale(year))
+                .text(year);
         });
     }
 
@@ -534,6 +529,11 @@ class GapPlot {
         // you will need to call it from the updateHighlight function in script.js
         */
         //TODO - your code goes here -
+
+        let selectReg = d3.selectAll("."+activeCountry["region"]);
+        
+        selectReg.classed("hidden",true);
+        
     }
 
     /**
@@ -549,6 +549,8 @@ class GapPlot {
         // d3 selection and .classed to set these classes off here.
         //TODO - your code goes here -
 
+        d3.selectAll("circle").classed("hidden",false);
+       
     }
 
     /**

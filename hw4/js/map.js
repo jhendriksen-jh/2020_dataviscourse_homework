@@ -59,49 +59,60 @@ class Map {
 
         let countryData = [];
 
-        for(let i = 0; i < geoJSON.features.length; i++){
-            let node = new CountryData(geoJSON.features[i].type,
-                geoJSON.features[i].id,
-                geoJSON.features[i].properties,
-                geoJSON.features[i].geometry,
-                geoJSON.features[i].region);
-            countryData.push(node);
-        }
+        // for(let i = 0; i < geoJSON.features.length; i++){
+        //     let node = new CountryData(geoJSON.features[i].type,
+        //         geoJSON.features[i].id,
+        //         geoJSON.features[i].properties,
+        //         geoJSON.features[i].geometry,
+        //         geoJSON.features[i].region);
+        //     countryData.push(node);
+        // }
 
-        for(let i = 0; i < this.populationData.length; i++ ){
-            for(let j = 0; j < countryData.length; j++){
-                if(countryData[j].id === this.populationData[i].geo.toUpperCase()){
-                    countryData[j].region = this.populationData[i].region;
-                }
-            }
-        }
+        // for(let i = 0; i < this.populationData.length; i++ ){
+        //     for(let j = 0; j < countryData.length; j++){
+        //         if(countryData[j].id === this.populationData[i].geo.toUpperCase()){
+        //             countryData[j].region = this.populationData[i].region;
+        //         }
+        //     }
+        // }
 
-        for(let i = 0; i < countryData.length; i++){
-            if(countryData[i].region === undefined){
-                countryData[i].region = "countries";
-            }
-        }
+        // for(let i = 0; i < countryData.length; i++){
+        //     if(countryData[i].region === undefined){
+        //         countryData[i].region = "countries";
+        //     }
+        // }
 
 
-        let map = d3.select("#map-chart svg");
-            map.selectAll("path")
-                .data(countryData)
-                .enter()
-                .append("path")
-                .attr("d",path)
-                .attr("id", (d) => d.id)
-                .attr("class",(d) => ""+d.region+ " boundary");
+        // let map = d3.select("#map-chart svg");
+        //     map.selectAll("path")
+        //         .data(countryData)
+        //         .enter()
+        //         .append("path")
+        //         .attr("d",path)
+        //         .attr("id", (d) => d.id)
+        //         .attr("class",(d) => ""+d.region+ " boundary");
                 
-        let graticule = d3.geoGraticule();    
-            map.append("path")
-                .datum(graticule)
-                .attr("class","graticule")
-                .attr("d",path);
-            map.append("path")
-                .datum(graticule.outline)
-                .attr("class","stroke")
-                .attr("d",path)
-                        
+        // let that = this;            
+        // let selectedCountry = d3.select("#map-chart").selectAll("svg").selectAll("path").data(countryData);
+        // debugger;
+        // console.log(selectedCountry)
+
+        // selectedCountry.on("click",function(d){
+        
+        //     that.updateCountry(d);
+        // })
+
+        // let graticule = d3.geoGraticule();    
+        //     map.append("path")
+        //         .datum(graticule)
+        //         .attr("class","graticule")
+        //         .attr("d",path);
+        //     map.append("path")
+        //         .datum(graticule.outline)
+        //         .attr("class","stroke")
+        //         .attr("d",path)
+        
+
         // Hint: assign an id to each country path to make it easier to select afterwards
         // we suggest you use the variable in the data element's id field to set the id
 
@@ -127,6 +138,9 @@ class Map {
 
         //TODO - your code goes here
 
+        let selectReg = d3.selectAll("."+activeCountry["region"]);
+        
+        selectReg.classed("hidden",true);
     }
 
     /**
@@ -142,5 +156,6 @@ class Map {
         // d3 selection and .classed to set these classes off here.
 
         //TODO - your code goes here
+        d3.selectAll("path").classed("hidden",false);
     }
 }

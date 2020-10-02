@@ -16,9 +16,20 @@ loadData().then(data => {
      */
     function updateCountry(countryID) {
 
-        that.activeCountry = countryID;
-
+        
         // TODO - your code goes here
+        if(countryID == null){
+            gapPlot.clearHighlight();
+            worldMap.clearHighlight();
+        }
+        else {
+            that.activeCountry = countryID;
+            gapPlot.updateHighlightClick(countryID);
+            worldMap.updateHighlightClick(countryID);
+            
+            gapPlot.activeCountry = countryID;
+            worldMap.activeCountry = countryID;
+        }
     }
 
     // ******* TODO: PART 3 *******
@@ -45,6 +56,7 @@ loadData().then(data => {
     //TODO - your code goes here -
     gapPlot.updatePlot(this.activeYear,"population","population","population");
     
+
     // here we load the map data
     d3.json('data/world.json').then(mapData => {
 

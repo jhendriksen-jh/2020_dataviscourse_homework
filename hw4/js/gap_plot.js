@@ -203,8 +203,6 @@ class GapPlot {
          * @returns {number} the radius
          */
         let circleSizer = function (d) {
-            // let minSize = d3.min(d);
-            // let maxSize = d3.max(d);
             let cScale = d3.scaleSqrt().range([3, 20]).domain([minSize, maxSize]);
             return d.circleSize ? cScale(d.circleSize) : 3;
         };
@@ -219,8 +217,8 @@ class GapPlot {
         for(let i = 0; i<this.data[""+circleSizeIndicator].length; i++){
             cValList[i] = this.data[""+circleSizeIndicator][i][this.activeYear]; 
         }
-        let minSize = d3.min(cValList);
-        let maxSize = d3.min(cValList);
+        var minSize = d3.min(cValList);
+        var maxSize = d3.max(cValList);
 
         for(let i = 0; i < this.data[""+xIndicator].length; i++){
             let node = new PlotData(this.data[""+xIndicator][i].country,
@@ -241,6 +239,10 @@ class GapPlot {
             }
         }
         
+        for(let i = 0; i < plotDataArr.length; i++){
+            plotDataArr[i].circleSize = circleSizer(plotDataArr[i]);
+        }
+
         console.log(plotDataArr)
 
         let xValList = []
@@ -256,15 +258,21 @@ class GapPlot {
         let xScale = d3.scaleLinear().domain([d3.min(xValList),d3.max(xValList)]).range([0,this.width]);
         let yAxis = d3.axisLeft(yScale).ticks(10);
         let xAxis = d3.axisBottom(xScale).ticks(6);
-        let h = this.height;
+       
         d3.select("#y-axis").call(yAxis).attr("transform","translate("+this.margin.left+",0)");
         d3.select("#x-axis").call(xAxis).attr("transform","translate("+this.margin.left+","+this.height+")");
+
+        d3.select(".plot-svg").append("text")
+            .classed("x-label",true)
+            .classed("axis-label",true)
+            .attr("transform","translate(30,430)")
+            .text(function() {return xIndicator});
 
         let chartSVG = d3.select(".plot-svg").selectAll("circle");
         
         chartSVG.data(plotDataArr)
             .enter().append("circle").merge(chartSVG)
-            .attr("r",(d,i) => circleSizer(d.circleSize))
+            .attr("r",(d,i) => d.circleSize)
             .attr("cx",(d,i) => xScale(d.xVal))
             .attr("cy",(d,i) => yScale(d.yVal))
             .attr("class", (d) => ""+d.region)

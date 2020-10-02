@@ -33,6 +33,7 @@ loadData().then(data => {
 
         //TODO - your code goes here -
         that.activeYear = year;
+        gapPlot.activeYear = year;
     }
     // Creates the view objects
     const infoBox = new InfoBox(data);

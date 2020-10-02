@@ -49,7 +49,7 @@ class GapPlot {
         this.activeYear = activeYear;
 
         this.data = data;
-
+        this.updateYear = updateYear;
         //TODO - your code goes here -
         this.drawPlot(data);
         this.drawYearBar(updateYear);
@@ -114,12 +114,13 @@ class GapPlot {
         d3.select(".plot-svg").append("text")
             .classed("x-label",true)
             .classed("axis-label",true)
-            .attr("text-anchor")
+            .attr("text-anchor","middle")
             .attr("transform","translate("+(this.width + this.margin.left + this.margin.right)/2+","+(this.height+this.margin.bottom)+")")
         
         d3.select(".plot-svg").append("text")
             .classed("y-label",true)
             .classed("axis-label",true)
+            .attr("text-anchor","middle")
             .attr("transform","translate("+this.margin.right/2+","+(this.height+this.margin.bottom+this.margin.top)/2+") rotate(-90)")
 
         d3.select(".plot-svg").append("text")
@@ -471,7 +472,7 @@ class GapPlot {
         yearSlider.on('input', function () {
             //TODO - your code goes here -
             let year = this.value;
-            updateYear = year;
+            that.updateYear(year);
             // console.log(year);
             let dropX = d3.select('.dropdown-wrapper').select('#dropdown_x').select('.dropdown-content').select('select');
             let dropY = d3.select('.dropdown-wrapper').select('#dropdown_y').select('.dropdown-content').select('select');
@@ -479,7 +480,7 @@ class GapPlot {
             let xValue = dropX.node().value;
             let cValue = dropC.node().value;
             let yValue = dropY.node().value;
-            that.updatePlot(this.activeYear, xValue, yValue, cValue);
+            that.updatePlot(year, xValue, yValue, cValue);
         });
     }
 

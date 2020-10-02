@@ -20,15 +20,15 @@ loadData().then(data => {
         // TODO - your code goes here
         if(countryID == null){
             gapPlot.clearHighlight();
-            worldMap.clearHighlight();
+            // worldMap.clearHighlight();
         }
         else {
             that.activeCountry = countryID;
             gapPlot.updateHighlightClick(countryID);
-            worldMap.updateHighlightClick(countryID);
+            // worldMap.updateHighlightClick(countryID);
             
             gapPlot.activeCountry = countryID;
-            worldMap.activeCountry = countryID;
+            // worldMap.activeCountry = countryID;
         }
     }
 

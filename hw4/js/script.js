@@ -32,7 +32,7 @@ loadData().then(data => {
     function updateYear(year) {
 
         //TODO - your code goes here -
-
+        that.activeYear = year;
     }
     // Creates the view objects
     const infoBox = new InfoBox(data);

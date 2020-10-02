@@ -52,7 +52,7 @@ class GapPlot {
 
         //TODO - your code goes here -
         this.drawPlot(data);
-        this.drawYearBar(updateYear);
+        this.drawYearBar(this.updateYear);
         this.drawDropDown();
         // this.updatePlot(this.activeYear,"population","population","population")
         // ******* TODO: PART 3 *******
@@ -217,33 +217,64 @@ class GapPlot {
         for(let i = 0; i<this.data[""+circleSizeIndicator].length; i++){
             cValList[i] = this.data[""+circleSizeIndicator][i][this.activeYear]; 
         }
-        var minSize = d3.min(cValList);
-        var maxSize = d3.max(cValList);
+
+        let minSize = Math.min.apply(null, cValList.filter(Boolean));
+        let maxSize = Math.max(cValList);
+
+        // for(let i = 0; i < this.data[""+xIndicator].length; i++){
+        //     let node = new PlotData(this.data[""+xIndicator][i].country,
+        //     this.data[""+xIndicator][i][this.activeYear],
+        //     "yVal",
+        //     this.data[""+xIndicator][i].geo,
+        //     "countries",
+        //     "circle");
+        //     plotDataArr.push(node);
+        // }
 
         for(let i = 0; i < this.data[""+xIndicator].length; i++){
-            let node = new PlotData(this.data[""+xIndicator][i].country,
-            this.data[""+xIndicator][i][this.activeYear],
-            this.data[""+yIndicator][i][this.activeYear],
-            this.data[""+xIndicator][i].geo,
-            "countries",
-            this.data[""+circleSizeIndicator][i][this.activeYear]);
-            plotDataArr.push(node);
+            for(let j = 0; j < this.data[""+yIndicator].length; j++){
+                if(this.data[""+xIndicator][i].country === this.data[""+yIndicator][j].country){
+                    for(let k = 0; k < this.data[""+circleSizeIndicator].length; k++){
+                        if((this.data[""+xIndicator][i].country === this.data[""+yIndicator][j].country) &&
+                            (this.data[""+xIndicator][i].country === this.data[""+circleSizeIndicator][k].country)){
+                            let node = new PlotData(this.data[""+xIndicator][i].country,
+                                this.data[""+xIndicator][i][this.activeYear],
+                                this.data[""+yIndicator][j][this.activeYear],
+                                this.data[""+xIndicator][i].geo,
+                                "countries",
+                                this.data[""+circleSizeIndicator][k][this.activeYear]);
+                                plotDataArr.push(node);
+                        }
+                    }
+                }
+            }
         }
+
+        // for(let i = 0; i < this.data[""+xIndicator].length; i++){
+        //     let node = new PlotData(this.data[""+xIndicator][i].country,
+        //     this.data[""+xIndicator][i][this.activeYear],
+        //     this.data[""+yIndicator][i][this.activeYear],
+        //     this.data[""+xIndicator][i].geo,
+        //     "countries",
+        //     this.data[""+circleSizeIndicator][i][this.activeYear]);
+        //     plotDataArr.push(node);
+        // }
         
         // write another for loop to assign region using pop data or others
         for(let i = 0; i < plotDataArr.length; i++){
             for(let k = 0; k < this.data["population"].length; k++){
-                if(plotDataArr[i].id === this.data["population"][k].geo){
+                if(plotDataArr[i].country === this.data["population"][k].country){
                     plotDataArr[i].region = this.data["population"][k].region;
                 } 
             }
         }
         
+        // scale the circles
         for(let i = 0; i < plotDataArr.length; i++){
             plotDataArr[i].circleSize = circleSizer(plotDataArr[i]);
         }
 
-        console.log(plotDataArr)
+        
 
         let xValList = []
         for(let i = 0; i<plotDataArr.length; i++){
@@ -253,7 +284,7 @@ class GapPlot {
         for(let i = 0; i<plotDataArr.length; i++){
             yValList[i] = plotDataArr[i].yVal; 
         }
-
+        // create scales and axes
         let yScale = d3.scaleLinear().domain([d3.min(yValList),d3.max(yValList)]).range([this.height,this.margin.bottom]);
         let xScale = d3.scaleLinear().domain([d3.min(xValList),d3.max(xValList)]).range([0,this.width]);
         let yAxis = d3.axisLeft(yScale).ticks(10);
@@ -261,12 +292,23 @@ class GapPlot {
        
         d3.select("#y-axis").call(yAxis).attr("transform","translate("+this.margin.left+",0)");
         d3.select("#x-axis").call(xAxis).attr("transform","translate("+this.margin.left+","+this.height+")");
-
+        // labels and such
         d3.select(".plot-svg").append("text")
             .classed("x-label",true)
             .classed("axis-label",true)
-            .attr("transform","translate(30,430)")
+            .attr("transform","translate("+(this.width + this.margin.left + this.margin.right)/2+","+(this.height+this.margin.bottom)+")")
             .text(function() {return xIndicator});
+
+        d3.select(".plot-svg").append("text")
+            .classed("y-label",true)
+            .classed("axis-label",true)
+            .attr("transform","translate("+this.margin.right/2+","+(this.height+this.margin.bottom+this.margin.top)/2+") rotate(-90)")
+            .text(function() {return yIndicator});
+
+        d3.select(".plot-svg").append("text")
+            .attr("class","activeYear-background")
+            .attr("transform","translate(100,150)")
+            .text(function() {return activeYear});
 
         let chartSVG = d3.select(".plot-svg").selectAll("circle");
         
@@ -424,8 +466,8 @@ class GapPlot {
         yearSlider.on('input', function () {
             //TODO - your code goes here -
             let year = this.value;
-            // updateYear(year);
-            console.log(year)
+            that.updateYear(year);
+            console.log(year);
             // that.updatePlot(this.activeYear, xValue, yValue, cValue);
         });
     }

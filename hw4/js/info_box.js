@@ -45,6 +45,7 @@ class InfoBox {
          */
 
         //TODO - your code goes here -
+        debugger;
         console.log(activeYear)
         console.log(activeCountry)
     }

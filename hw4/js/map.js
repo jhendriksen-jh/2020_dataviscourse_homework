@@ -156,11 +156,6 @@ class Map {
         //TODO - your code goes here
         
         d3.selectAll("path").classed("selected-country",false);
-        d3.select("#detail-svg")
-            .style("opacity",1)
-            .transition()
-            .duration(1500)
-            .style("opacity",0)
-            .remove();
+        
     }
 }

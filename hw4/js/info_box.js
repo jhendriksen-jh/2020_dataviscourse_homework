@@ -71,28 +71,32 @@ class InfoBox {
 
         for(let i = 0; i < infoData.length; i++){
             d3.select("#detail-svg").append("text")
-                .attr("y", 70+(i*25))
-                .attr("x", 60)
-                .text(function(d) {return infoData[i].indicator_name+": "+infoData[i].value+" "});
+                .attr("y", 86+(i*28))
+                .attr("x", 65)
+                .attr("font-size", 19)
+                .text(function(d) {return infoData[i].indicator_name.charAt(0).toUpperCase()
+                    +infoData[i].indicator_name.slice(1)+": "+infoData[i].value+" "});
         }
         for(let j = 0; j < infoData.length; j++){
             d3.select("#detail-svg").append("circle")
-                    .attr("cy", 65+(j*25))
+                    .attr("cy", 80+(j*28))
                     .attr("cx", 50)
-                    .attr("r",5)
+                    .attr("r",7)
                     .attr("class", (t) => {return infoData[0].region});
         }
 
         d3.select("#detail-svg").append("text")
-            .attr("y", 20)
+            .attr("y", 30)
+            .attr("x",5)
             .text(infoData[0].country)
-            .attr("font-weight", "bold");
-        d3.select("#detail-svg").append("text")
-            .attr("y", 45)
-            .attr("x", 30)
             .attr("font-weight", "bold")
-            .text((t) => {return "Region: "+infoData[0].region});
-
+            .attr("font-size",25);
+        d3.select("#detail-svg").append("text")
+            .attr("y", 58)
+            .attr("x", 35)
+            .attr("font-weight", "bold")
+            .attr("font-size", 22)
+            .text((t) => {return "Region: " +infoData[0].region.charAt(0).toUpperCase() +  infoData[0].region.slice(1)});
     }
 
     /**
@@ -101,6 +105,12 @@ class InfoBox {
     clearHighlight() {
 
         //TODO - your code goes here -
+        d3.select("#detail-svg")
+            .style("opacity",1)
+            .transition()
+            .duration(1500)
+            .style("opacity",0)
+            .remove();
     }
 
 }

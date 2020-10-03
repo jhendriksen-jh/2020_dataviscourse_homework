@@ -21,15 +21,14 @@ loadData().then(data => {
         if(countryID == null){
             gapPlot.clearHighlight();
             worldMap.clearHighlight();
+            infoBox.clearHighlight();
+            that.activeCountry = countryID;
         }
         else {
             that.activeCountry = countryID;
             gapPlot.updateHighlightClick(countryID);
             worldMap.updateHighlightClick(countryID);
             infoBox.updateTextDescription(activeCountry,activeYear);
-
-            gapPlot.activeCountry = countryID;
-            worldMap.activeCountry = countryID;
         }
     }
 
@@ -46,7 +45,9 @@ loadData().then(data => {
         //TODO - your code goes here -
         that.activeYear = year;
         gapPlot.activeYear = year;
-        infoBox.updateTextDescription(activeCountry,activeYear);
+        if(activeCountry !== null){
+            infoBox.updateTextDescription(activeCountry,activeYear);
+        }
     }
     // Creates the view objects
     const infoBox = new InfoBox(data);

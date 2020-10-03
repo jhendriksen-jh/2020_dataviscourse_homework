@@ -351,12 +351,13 @@ div.tooltip {
 
 .africa {
     fill: #FFCA28;
-    /*  stroke-width: 1px;*/
+    
 }
 
 path.africa.selected-country,
 circle.africa.selected-country {
     fill: #cc9a04;
+    /*  stroke-width: 1px;*/
     /* stroke: #000000;*/
 }
 

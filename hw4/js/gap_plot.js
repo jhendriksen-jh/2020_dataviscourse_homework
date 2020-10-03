@@ -261,7 +261,7 @@ class GapPlot {
                             let node = new PlotData(this.data[""+xIndicator][i].country,
                                 this.data[""+xIndicator][i][this.activeYear],
                                 this.data[""+yIndicator][j][this.activeYear],
-                                this.data[""+xIndicator][i].geo,
+                                this.data[""+xIndicator][i].geo.toUpperCase(),
                                 "countries",
                                 this.data[""+circleSizeIndicator][k][this.activeYear]);
                                 plotDataArr.push(node);
@@ -309,17 +309,25 @@ class GapPlot {
             .attr("cx",(d,i) => xScale(d.xVal))
             .attr("cy",(d,i) => yScale(d.yVal))
             .attr("class", (d) => ""+d.region)
+            .attr("id", (d) => ""+d.id)
             .attr("transform","translate("+this.margin.left+",0)");
         chartSVG.data(plotDataArr)
             .exit().remove();
 
-        let selctedCircle = d3.select(".plot-svg").selectAll("circle").data(plotDataArr);
+        let selectedCircle = d3.select(".plot-svg").selectAll("circle").data(plotDataArr);
 
         let that = this;
 
-        selctedCircle.on("click", function(d){
+        selectedCircle.on("click", function(d){
             that.updateCountry(d);
         })
+
+        selectedCircle.on("mouseover", function(d){
+            d3.select(this).append("title")
+            .attr("class", "tooltip h2")
+            .text(that.tooltipRender(d))
+        })
+
     }
 
     /**
@@ -466,7 +474,6 @@ class GapPlot {
             //TODO - your code goes here -
             let year = this.value;
             that.updateYear(year);
-            // console.log(year);
             let dropX = d3.select('.dropdown-wrapper').select('#dropdown_x').select('.dropdown-content').select('select');
             let dropY = d3.select('.dropdown-wrapper').select('#dropdown_y').select('.dropdown-content').select('select');
             let dropC = d3.select('.dropdown-wrapper').select('#dropdown_c').select('.dropdown-content').select('select');
@@ -529,10 +536,15 @@ class GapPlot {
         // you will need to call it from the updateHighlight function in script.js
         */
         //TODO - your code goes here -
+        
+        d3.select(".plot-svg").selectAll("circle").classed("hidden",true)
 
         let selectReg = d3.selectAll("."+activeCountry["region"]);
-        
-        selectReg.classed("hidden",true);
+
+        selectReg.classed("hidden",false);
+
+        let selectCountry = d3.selectAll("#"+activeCountry.id);
+        selectCountry.classed("selected-country",true)
         
     }
 
@@ -550,7 +562,7 @@ class GapPlot {
         //TODO - your code goes here -
 
         d3.selectAll("circle").classed("hidden",false);
-       
+        d3.selectAll("circle").classed("selected-country",false);
     }
 
     /**
@@ -559,7 +571,7 @@ class GapPlot {
      * @returns {string}
      */
     tooltipRender(data) {
-        let text = "<h2>" + data['country'] + "</h2>";
+        let text = data['country'];
         return text;
     }
 

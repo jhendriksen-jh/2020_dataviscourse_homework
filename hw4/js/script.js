@@ -20,15 +20,16 @@ loadData().then(data => {
         // TODO - your code goes here
         if(countryID == null){
             gapPlot.clearHighlight();
-            // worldMap.clearHighlight();
+            worldMap.clearHighlight();
         }
         else {
             that.activeCountry = countryID;
             gapPlot.updateHighlightClick(countryID);
-            // worldMap.updateHighlightClick(countryID);
-            
+            worldMap.updateHighlightClick(countryID);
+            infoBox.updateTextDescription(activeCountry,activeYear);
+
             gapPlot.activeCountry = countryID;
-            // worldMap.activeCountry = countryID;
+            worldMap.activeCountry = countryID;
         }
     }
 
@@ -63,9 +64,9 @@ loadData().then(data => {
         // ******* TODO: PART I *******
         // You need to pass the world topo data to the drawMap() function as a parameter, along with the starting activeYear.
         //TODO - your code goes here -
-
+        
         worldMap.drawMap(mapData,activeYear);
-
+        
     });
 
     // This clears a selection by listening for a click

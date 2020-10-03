@@ -24,7 +24,7 @@ class InfoBox {
     constructor(data) {
 
         //TODO - your code goes here -
-
+        this.data = data;
     }
 
     /**
@@ -45,6 +45,8 @@ class InfoBox {
          */
 
         //TODO - your code goes here -
+        console.log(activeYear)
+        console.log(activeCountry)
     }
 
     /**

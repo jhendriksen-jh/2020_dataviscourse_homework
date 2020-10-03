@@ -26,7 +26,6 @@ loadData().then(data => {
             that.activeCountry = countryID;
             gapPlot.updateHighlightClick(countryID);
             worldMap.updateHighlightClick(countryID);
-            debugger;
             infoBox.updateTextDescription(activeCountry,activeYear);
 
             gapPlot.activeCountry = countryID;
@@ -47,6 +46,7 @@ loadData().then(data => {
         //TODO - your code goes here -
         that.activeYear = year;
         gapPlot.activeYear = year;
+        infoBox.updateTextDescription(activeCountry,activeYear);
     }
     // Creates the view objects
     const infoBox = new InfoBox(data);

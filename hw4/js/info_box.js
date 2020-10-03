@@ -45,9 +45,54 @@ class InfoBox {
          */
 
         //TODO - your code goes here -
-        debugger;
-        console.log(activeYear)
-        console.log(activeCountry)
+
+        let infoData = [];
+
+        let dataKey = Object.keys(this.data);
+        let dataValue = Object.values(this.data);
+
+        for(let i = 0; i < 5; i++){
+            for(let j = 0; j < dataValue[i].length; j++){
+                if(activeCountry.id === dataValue[i][j].geo.toUpperCase()){
+                    let node = new InfoBoxData (dataValue[i][j].country,
+                        dataValue[i][j].region,
+                        dataKey[i],
+                        dataValue[i][j][activeYear]);
+                    infoData.push(node);
+                }
+            }
+        }
+        d3.select("#country-detail").select("svg").remove();
+
+        d3.select("#country-detail").append("svg").attr("id","detail-svg").attr("height",200).attr("width",780);
+
+        let box = d3.select("#detail-svg").selectAll("text");
+        box.remove();
+
+        for(let i = 0; i < infoData.length; i++){
+            d3.select("#detail-svg").append("text")
+                .attr("y", 70+(i*25))
+                .attr("x", 60)
+                .text(function(d) {return infoData[i].indicator_name+": "+infoData[i].value+" "});
+        }
+        for(let j = 0; j < infoData.length; j++){
+            d3.select("#detail-svg").append("circle")
+                    .attr("cy", 65+(j*25))
+                    .attr("cx", 50)
+                    .attr("r",5)
+                    .attr("class", (t) => {return infoData[0].region});
+        }
+
+        d3.select("#detail-svg").append("text")
+            .attr("y", 20)
+            .text(infoData[0].country)
+            .attr("font-weight", "bold");
+        d3.select("#detail-svg").append("text")
+            .attr("y", 45)
+            .attr("x", 30)
+            .attr("font-weight", "bold")
+            .text((t) => {return "Region: "+infoData[0].region});
+
     }
 
     /**

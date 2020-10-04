@@ -119,7 +119,7 @@ You will have data that will scale the circles called circleSizeIndicator. We ha
 ![Gap Plot](figs/gapplot.PNG)
 
 ### 2.2 The Drop-down Menus
-There are three drop down menus: the x and y data menus, and the circle data menu. Changing the menus redraws the plot from the currently selected data.The drop-drown structure is provided for you, but you will set up the `drawPlot()` function to be called when a new data set is selected. All three drop down menus will have all of the data categories (child mortality, GDP per capita, life expectancy, fertility rate, and population) to select from.
+There are three drop down menus: the x and y data menus, and the circle data menu. Changing the menus redraws the plot from the currently selected data.The drop-drown structure is provided for you, but you will set up the `updatePlot()` function to be called when a new data set is selected. All three drop down menus will have all of the data categories (child mortality, GDP per capita, life expectancy, fertility rate, and population) to select from.
 
 This gif shows the desired behavior:
 

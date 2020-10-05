@@ -83,14 +83,15 @@ class Table {
          * with the forecastSelection you need to set the text based on the dat value as long as the type is 'text'
          */
 
+        // forecastSelection selects all rows within a table
         let vizSelection = forecastSelection.filter(d => d.type === 'viz');
-
+        // this adds an svg to the central cell of the table in all rows 
         let svgSelect = vizSelection.selectAll('svg')
             .data(d => [d])
             .join('svg')
             .attr('width', this.vizWidth)
             .attr('height', d => d.isForecast ? this.vizHeight : this.smallVizHeight);
-
+        // adds a group to the svg of each row so multiple elements can be added more easily and transformed
         let grouperSelect = svgSelect.selectAll('g')
             .data(d => [d, d, d])
             .join('g');
@@ -98,6 +99,51 @@ class Table {
         this.addGridlines(grouperSelect.filter((d,i) => i === 0), [-75, -50, -25, 0, 25, 50, 75]);
         this.addRectangles(grouperSelect.filter((d,i) => i === 1));
         this.addCircles(grouperSelect.filter((d,i) => i === 2));
+
+
+        // portion that I have coded
+        console.log("tableData", this.tableData)
+        console.log("forecast-selection", forecastSelection)
+        
+        // first should filter this selection to include only the cells of type text - skip over SVG cell in middle column
+        // text should be set based on the data - look carefully in rowToCellDataTransform function to determine how
+        // to find the data you need - filter selection based on data? - use d3.selection filter
+
+        // forecastSelection has this.rowToCellDataTransform of this.tableData bound to it - this transforms the data and assigns
+        // it cell by cell so all that needs be done is append the text - its even formated
+        let textSelect = forecastSelection.filter(d => d.type === "text");
+            textSelect.append("text")
+                .text(d => d.value)
+        
+        // Add the legend to the center middle
+        let legendSelect = d3.select("#marginAxis")
+            .attr("height", this.vizHeight)
+            .attr("width", this.vizWidth)
+            
+        for(let i = 0; i < 3; i++){
+            legendSelect.append("text")
+                .attr("x", x => (i*(this.vizWidth/6)))
+                .attr("y",this.vizHeight/2)
+                .attr("class", "biden")
+                .text(function() {return "+"+(75 - i*25)});
+        }
+           
+        legendSelect.append("rect")
+            .attr("x", (3*this.vizWidth/6))
+            // .attr("y",this.vizHeight)
+            .attr("height", this.vizHeight)
+            .attr("width", 3);
+
+        for(let i = 0; i < 3; i++){
+            legendSelect.append("text")
+                .attr("x", x => ((4*this.vizWidth/6)+i*(this.vizWidth/6)))
+                .attr("y", this.vizHeight/2)
+                .attr("class","trump")
+                .attr("text-anchor","end")
+                .text(function() {return "+"+(25 + i*25)});
+        }
+        
+        
     }
 
     rowToCellDataTransform(d) {

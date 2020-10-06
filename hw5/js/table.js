@@ -203,6 +203,7 @@ class Table {
         /**
          * update the column headers based on the sort state
          */
+        let that = this;
 
         let stateCol = d3.selectAll(".sortable").filter((d,i) => i === 0);
         let predCol = d3.selectAll(".sortable").filter((d,i) => i === 1);
@@ -217,7 +218,11 @@ class Table {
                 d3.select(this).classed("sorting",true)
                 d3.select(this).select(".fas").classed("no-display",false).classed("fa-sort-up",true)
                 clickNumPred = 0;
+                predCol.classed("sorting",false)
+                predCol.select(".fas").classed("no-display",true).classed("fa-sort-down",false)
                 clickNumWin = 0;
+                winCol.classed("sorting",false)
+                winCol.select(".fas").classed("no-display",true).classed("fa-sort-down",false)
                 clickNumState = clickNumState+1;
             }   
             else if(clickNumState == 1){
@@ -236,7 +241,11 @@ class Table {
                 d3.select(this).classed("sorting",true)
                 d3.select(this).select(".fas").classed("no-display",false).classed("fa-sort-up",true)
                 clickNumWin = 0;
+                winCol.classed("sorting",false)
+                winCol.select(".fas").classed("no-display",true).classed("fa-sort-down",false)
                 clickNumState = 0;
+                stateCol.classed("sorting",false)
+                stateCol.select(".fas").classed("no-display",true).classed("fa-sort-down",false)
                 clickNumPred = clickNumPred+1;
             }   
             else if(clickNumPred == 1){
@@ -248,6 +257,7 @@ class Table {
                 d3.select(this).select(".fas").classed("no-display",true).classed("fa-sort-down",false)
                 clickNumPred = 0;
             }
+            // that.attachSortHandlers();
         })
 
         winCol.on("click", function(d,i){
@@ -255,7 +265,11 @@ class Table {
                 d3.select(this).classed("sorting",true)
                 d3.select(this).select(".fas").classed("no-display",false).classed("fa-sort-up",true)
                 clickNumState = 0;
+                stateCol.classed("sorting",false)
+                stateCol.select(".fas").classed("no-display",true).classed("fa-sort-down",false)
                 clickNumPred = 0;
+                predCol.classed("sorting",false)
+                predCol.select(".fas").classed("no-display",true).classed("fa-sort-down",false)
                 clickNumWin = clickNumWin+1;
             }   
             else if(clickNumWin == 1){
@@ -412,25 +426,25 @@ class Table {
         let winCol = d3.selectAll(".sortable").filter((d,i) => i === 2);
 
         let clickNumState = 0;
-        let clickNumPred = 0;
+        let predSort = 0;
         let clickNumWin = 0;
 
         
-        predCol.on("click", function(d,i){
-            if(clickNumPred == 0){
-                clickNumPred = clickNumPred+1;
-            }   
-            else if(clickNumPred == 1){
-                clickNumPred = clickNumPred+1;
-            }
-            else{
-                clickNumPred = 0;
-            }
-            let tDS = that.tableData.slice().sort((a,b) => d3.ascending(a.margin,b.margin))
-           console.log("original",that.tableData)
-           console.log("sorted",tDS)
-           console.log("header", that.headerData)
-        })
+        // predCol.on("click", function(d,i){
+        //     if(predSort == 0){
+        //         predSort = predSort+1;
+        //     }   
+        //     else if(predSort == 1){
+        //         predSort = predSort+1;
+        //     }
+        //     else{
+        //         predSort = 0;
+        //     }
+        //     let tDS = that.tableData.slice().sort((a,b) => d3.ascending(a.margin,b.margin))
+        //    console.log("original",that.tableData[1],that.tableData[4])
+        //    console.log("sorted",tDS)
+        //    console.log("header", that.headerData[1],that.tableData[4])
+        // })
     }
 
 

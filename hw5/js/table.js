@@ -204,6 +204,71 @@ class Table {
          * update the column headers based on the sort state
          */
 
+        let stateCol = d3.selectAll(".sortable").filter((d,i) => i === 0);
+        let predCol = d3.selectAll(".sortable").filter((d,i) => i === 1);
+        let winCol = d3.selectAll(".sortable").filter((d,i) => i === 2);
+
+        let clickNumState = 0;
+        let clickNumPred = 0;
+        let clickNumWin = 0;
+
+        stateCol.on("click", function(d,i){
+            if(clickNumState == 0){
+                d3.select(this).classed("sorting",true)
+                d3.select(this).select(".fas").classed("no-display",false).classed("fa-sort-up",true)
+                clickNumPred = 0;
+                clickNumWin = 0;
+                clickNumState = clickNumState+1;
+            }   
+            else if(clickNumState == 1){
+                d3.select(this).select(".fas").classed("fa-sort-up",false).classed("fa-sort-down",true)
+                clickNumState = clickNumState+1;
+            }
+            else{
+                d3.select(this).classed("sorting",false)
+                d3.select(this).select(".fas").classed("no-display",true).classed("fa-sort-down",false)
+                clickNumState = 0;
+            }
+        })
+        
+        predCol.on("click", function(d,i){
+            if(clickNumPred == 0){
+                d3.select(this).classed("sorting",true)
+                d3.select(this).select(".fas").classed("no-display",false).classed("fa-sort-up",true)
+                clickNumWin = 0;
+                clickNumState = 0;
+                clickNumPred = clickNumPred+1;
+            }   
+            else if(clickNumPred == 1){
+                d3.select(this).select(".fas").classed("fa-sort-up",false).classed("fa-sort-down",true)
+                clickNumPred = clickNumPred+1;
+            }
+            else{
+                d3.select(this).classed("sorting",false)
+                d3.select(this).select(".fas").classed("no-display",true).classed("fa-sort-down",false)
+                clickNumPred = 0;
+            }
+        })
+
+        winCol.on("click", function(d,i){
+            if(clickNumWin == 0){
+                d3.select(this).classed("sorting",true)
+                d3.select(this).select(".fas").classed("no-display",false).classed("fa-sort-up",true)
+                clickNumState = 0;
+                clickNumPred = 0;
+                clickNumWin = clickNumWin+1;
+            }   
+            else if(clickNumWin == 1){
+                d3.select(this).select(".fas").classed("fa-sort-up",false).classed("fa-sort-down",true)
+                clickNumWin = clickNumWin+1;
+            }
+            else{
+                d3.select(this).classed("sorting",false)
+                d3.select(this).select(".fas").classed("no-display",true).classed("fa-sort-down",false)
+                clickNumWin = 0;
+            }
+        })
+
     }
 
     addGridlines(containerSelect, ticks) {
@@ -340,8 +405,32 @@ class Table {
          * Attach click handlers to all the th elements inside the columnHeaders row.
          * The handler should sort based on that column and alternate between ascending/descending.
          */
+        let that = this;
 
+        let stateCol = d3.selectAll(".sortable").filter((d,i) => i === 0);
+        let predCol = d3.selectAll(".sortable").filter((d,i) => i === 1);
+        let winCol = d3.selectAll(".sortable").filter((d,i) => i === 2);
 
+        let clickNumState = 0;
+        let clickNumPred = 0;
+        let clickNumWin = 0;
+
+        
+        predCol.on("click", function(d,i){
+            if(clickNumPred == 0){
+                clickNumPred = clickNumPred+1;
+            }   
+            else if(clickNumPred == 1){
+                clickNumPred = clickNumPred+1;
+            }
+            else{
+                clickNumPred = 0;
+            }
+            let tDS = that.tableData.slice().sort((a,b) => d3.ascending(a.margin,b.margin))
+           console.log("original",that.tableData)
+           console.log("sorted",tDS)
+           console.log("header", that.headerData)
+        })
     }
 
 

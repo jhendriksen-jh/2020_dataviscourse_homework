@@ -53,6 +53,35 @@ class Table {
          * Draw the legend for the bar chart.
          */
 
+        // Add the legend to the center middle
+        let legendSelect = d3.select("#marginAxis")
+            .attr("height", this.vizHeight)
+            .attr("width", this.vizWidth)
+            
+        for(let i = 0; i < 3; i++){
+            legendSelect.append("text")
+                .attr("x", x => this.scaleX((-1*i*25) - 25))
+                .attr("y",this.smallVizHeight)
+                .attr("class", "biden")
+                .attr("text-anchor","middle")
+                .text(function() {return "+"+(25 + i*25)});
+        }
+           
+        legendSelect.append("rect")
+            .attr("x", (3*this.vizWidth/6))
+            // .attr("y",this.vizHeight)
+            .attr("height", this.vizHeight)
+            .attr("width", 1);
+
+        for(let i = 0; i < 3; i++){
+            legendSelect.append("text")
+                .attr("x", x => this.scaleX((i*25)+25))
+                .attr("y", this.smallVizHeight)
+                .attr("class","trump")
+                .attr("text-anchor","middle")
+                .text(function() {return "+"+(25 + i*25)});
+        }
+
     }
 
     drawTable() {
@@ -96,14 +125,14 @@ class Table {
             .data(d => [d, d, d])
             .join('g');
 
+        // i being set determines which of the groups is selected of the three present
         this.addGridlines(grouperSelect.filter((d,i) => i === 0), [-75, -50, -25, 0, 25, 50, 75]);
         this.addRectangles(grouperSelect.filter((d,i) => i === 1));
         this.addCircles(grouperSelect.filter((d,i) => i === 2));
 
-
         // portion that I have coded
-        console.log("tableData", this.tableData)
-        console.log("forecast-selection", forecastSelection)
+            // console.log("tableData", this.tableData)
+            // console.log("forecast-selection", forecastSelection)
         
         // first should filter this selection to include only the cells of type text - skip over SVG cell in middle column
         // text should be set based on the data - look carefully in rowToCellDataTransform function to determine how
@@ -115,33 +144,7 @@ class Table {
             textSelect.append("text")
                 .text(d => d.value)
         
-        // Add the legend to the center middle
-        let legendSelect = d3.select("#marginAxis")
-            .attr("height", this.vizHeight)
-            .attr("width", this.vizWidth)
-            
-        for(let i = 0; i < 3; i++){
-            legendSelect.append("text")
-                .attr("x", x => (i*(this.vizWidth/6)))
-                .attr("y",this.vizHeight/2)
-                .attr("class", "biden")
-                .text(function() {return "+"+(75 - i*25)});
-        }
-           
-        legendSelect.append("rect")
-            .attr("x", (3*this.vizWidth/6))
-            // .attr("y",this.vizHeight)
-            .attr("height", this.vizHeight)
-            .attr("width", 3);
-
-        for(let i = 0; i < 3; i++){
-            legendSelect.append("text")
-                .attr("x", x => ((4*this.vizWidth/6)+i*(this.vizWidth/6)))
-                .attr("y", this.vizHeight/2)
-                .attr("class","trump")
-                .attr("text-anchor","end")
-                .text(function() {return "+"+(25 + i*25)});
-        }
+        
         
         
     }
@@ -210,6 +213,26 @@ class Table {
         /**
          * add gridlines to the vizualization
          */
+
+        // Container select is using grouperSelect which selects the group that has been appended to the SVG of each row
+        // Ticks are defining location of where gridlines should be
+
+        // containerSelect.data(ticks)
+        //     .enter().append("rect")
+        //     .attr("x", d => this.scaleX(d))
+        //     .attr("height",this.vizHeight)
+        //     .attr("width", 1)
+        //     .attr("fill","gray");
+
+        for(let i = 0; i < ticks.length; i++){
+            containerSelect.append("rect")
+            .attr("x", this.scaleX(ticks[i]))
+            .attr("height", this.vizHeight)
+            .attr("width", 1)
+            .attr("fill", "#d1d1d1")
+            .attr("class",d => "gridline-"+i)
+        }
+        containerSelect.select(".gridline-3").attr("fill","black")
     
     }
 
@@ -221,7 +244,65 @@ class Table {
          * add rectangles for the bar charts
          */
 
- 
+        let that = this
+
+        containerSelect.data(d => [d.value])
+            .append("rect")
+            .attr("x", function(d) {
+                if((d.marginLow && d.marginHigh <= 0)||(d.marginHigh && d.marginLow >=0)){
+                    return that.scaleX(d.marginLow);
+                }
+                else{
+                    return that.scaleX(0);
+                }
+            })
+            .attr("y",(this.vizHeight-this.smallVizHeight)/2)
+            .attr("width", function(d) { 
+                if((d.marginLow && d.marginHigh <= 0)||(d.marginHigh && d.marginLow >=0)){
+                    return (that.scaleX(d.marginHigh) - that.scaleX(d.marginLow))
+                }
+                else{
+                    return (that.scaleX(d.marginHigh) - that.scaleX(0))
+                } 
+            })
+            .attr("height", this.smallVizHeight)
+            .attr("class",function(d) {
+                if((d.marginLow && d.marginHigh <= 0)||(d.marginHigh && d.marginLow >=0)){
+                    if(d.margin > 0){
+                        return "margin-bar trump"
+                    }
+                    else{
+                        return "margin-bar biden"
+                    }
+                }
+                else{
+                    return "margin-bar trump"
+                }
+        })
+           
+        containerSelect.data(d => [d.value])
+            .append("rect")
+            .attr("x", function(d) {
+                if((d.marginLow <= 0) && (d.marginHigh >= 0)){
+                    return  that.scaleX(d.marginLow)}
+            })
+            .attr("y",(this.vizHeight-this.smallVizHeight)/2)
+            .attr("width", function(d){
+                if((d.marginLow <= 0) && (d.marginHigh >= 0)){
+                    return (that.scaleX(0)-that.scaleX(d.marginLow))
+                }
+            })
+            .attr("height", this.smallVizHeight)
+            .attr("class",function(d) {
+                if((d.marginLow <= 0) && (d.marginHigh >= 0)){
+                    return "margin-bar biden"
+                }
+                else{
+                    return "no-display"
+                }
+            })
+        
+
     }
 
     addCircles(containerSelect) {
@@ -232,6 +313,21 @@ class Table {
          * add circles to the vizualizations
          */
 
+        containerSelect.data(d => [d.value])
+            .append("circle")
+            .attr("cx", d => this.scaleX(d.margin))
+            .attr("cy", this.vizHeight/2)
+            .attr("r", 5)
+            .attr("class", function(d) {
+                if(d.margin > 0){
+                    return "margin-circle trump"
+                }
+                else{
+                    return "margin-circle biden"
+                }
+            });
+        
+        
 
     }
 

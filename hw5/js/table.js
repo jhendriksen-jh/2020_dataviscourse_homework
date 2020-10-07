@@ -85,8 +85,6 @@ class Table {
     }
 
     drawTable() {
-        d3.select("#predictionTableBody").selectAll('*').remove()
-        let that = this;
         this.updateHeaders();
         let rowSelection = d3.select('#predictionTableBody')
             .selectAll('tr')
@@ -144,7 +142,7 @@ class Table {
         // forecastSelection has this.rowToCellDataTransform of this.tableData bound to it - this transforms the data and assigns
         // it cell by cell so all that needs be done is append the text - its even formated
         let textSelect = forecastSelection.filter(d => d.type === "text");
-            textSelect.append("text")
+            textSelect.join("text")
                 .text(d => d.value)
         
         
@@ -292,14 +290,14 @@ class Table {
         // Container select is using grouperSelect which selects the group that has been appended to the SVG of each row
         // Ticks are defining location of where gridlines should be
 
-        for(let i = 0; i < ticks.length; i++){
-            containerSelect.append("rect")
-            .attr("x", this.scaleX(ticks[i]))
+        containerSelect.selectAll("rect").data(ticks)
+            .join("rect")
+            .attr("x", d => this.scaleX(d))
             .attr("height", this.vizHeight)
             .attr("width", 1)
             .attr("fill", "#d1d1d1")
-            .attr("class",d => "gridline-"+i)
-        }
+            .attr("class",(d,i) => "gridline-"+i)
+
         containerSelect.select(".gridline-3").attr("fill","black")
     
     }
@@ -314,8 +312,8 @@ class Table {
 
         let that = this
 
-        containerSelect.data(d => [d.value])
-            .append("rect")
+        containerSelect.selectAll("rect").data(d => [d.value])
+            .join("rect")
             .attr("x", function(d) {
                 if((d.marginLow && d.marginHigh <= 0)||(d.marginHigh && d.marginLow >=0)){
                     return that.scaleX(d.marginLow);
@@ -381,22 +379,33 @@ class Table {
          * add circles to the vizualizations
          */
 
-        containerSelect.data(d => [d.value])
-            .append("circle")
-            .attr("cx", d => this.scaleX(d.margin))
-            .attr("cy", this.vizHeight/2)
-            .attr("r", 5)
+        containerSelect.filter(d => d.isForecast === undefined).selectAll("circle").data(d => [d])
+            .join("circle")
+            .attr("cx", d => this.scaleX(d.value.margin))
+            .attr("cy", this.smallVizHeight/2)
+            .attr("r", 3)
             .attr("class", function(d) {
-                if(d.margin > 0){
+                if(d.value.margin > 0){
                     return "margin-circle trump"
                 }
                 else{
                     return "margin-circle biden"
                 }
             });
-        
-        
 
+        containerSelect.filter(d => d.isForecast === true).selectAll("circle").data(d => [d])
+            .join("circle")
+            .attr("cx", d => this.scaleX(d.value.margin))
+            .attr("cy", this.vizHeight/2)
+            .attr("r", 5)
+            .attr("class", function(d) {
+                if(d.value.margin > 0){
+                    return "margin-circle trump"
+                }
+                else{
+                    return "margin-circle biden"
+                }
+            });
     }
 
     attachSortHandlers(stateSort,predSort,winSort) 
@@ -460,16 +469,26 @@ class Table {
         /**
          * Update table data with the poll data and redraw the table.
          */
-
+        this.tableData[index].isExpanded = true;
         let stateName = rowData.state;
         let statePolls = this.pollData.get(stateName);
-        // let pollRow = d3.select('#predictionTableBody').selectAll("tr").filter((d,i) => i === index);
-        // for(let i = 0; i < 5; i++){
-        //     pollRow.append("tr").append("td")
-        // }
-        console.log("row data is ",rowData,"index is",index)
-        console.log(statePolls)
-        // console.log(pollRow)
+        
+        for(let i = 0; i < statePolls.length; i++){
+            this.tableData.push(statePolls[i]);
+        }
+        
+        let stateDescPoll = this.tableData.slice().sort((a,b) => 
+                    d3.descending(a.state,b.state));
+            this.tableData = stateDescPoll;
+
+        this.drawTable();
+
+        // console.log(statePolls[2])
+        // console.log(this.tableData)
+        // console.log(newData)
+
+        // might be useful to write a sorting function that give like a counter for each cell that matches the state w/state at lowest
+        // and then give all other states zeros? maybe then it will not disturb them and just sort polls to be near state
 
     }
 

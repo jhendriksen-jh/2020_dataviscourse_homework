@@ -85,6 +85,8 @@ class Table {
     }
 
     drawTable() {
+        d3.select("#predictionTableBody").selectAll('*').remove()
+        let that = this;
         this.updateHeaders();
         let rowSelection = d3.select('#predictionTableBody')
             .selectAll('tr')
@@ -97,6 +99,7 @@ class Table {
                 {
                     this.toggleRow(d, this.tableData.indexOf(d));
                 }
+
             });
 
         let forecastSelection = rowSelection.selectAll('td')
@@ -209,78 +212,71 @@ class Table {
         let predCol = d3.selectAll(".sortable").filter((d,i) => i === 1);
         let winCol = d3.selectAll(".sortable").filter((d,i) => i === 2);
 
-        let clickNumState = 0;
-        let clickNumPred = 0;
-        let clickNumWin = 0;
-
         stateCol.on("click", function(d,i){
-            if(clickNumState == 0){
+            if(that.headerData[0].sorted === false && that.headerData[0].ascending === false){
                 d3.select(this).classed("sorting",true)
                 d3.select(this).select(".fas").classed("no-display",false).classed("fa-sort-up",true)
-                clickNumPred = 0;
-                predCol.classed("sorting",false)
-                predCol.select(".fas").classed("no-display",true).classed("fa-sort-down",false)
-                clickNumWin = 0;
-                winCol.classed("sorting",false)
-                winCol.select(".fas").classed("no-display",true).classed("fa-sort-down",false)
-                clickNumState = clickNumState+1;
+                that.headerData[0].sorted = true;
+                that.headerData[0].ascending = true;
+                that.attachSortHandlers();
             }   
-            else if(clickNumState == 1){
+            else if(that.headerData[0].sorted === true && that.headerData[0].ascending === true){
                 d3.select(this).select(".fas").classed("fa-sort-up",false).classed("fa-sort-down",true)
-                clickNumState = clickNumState+1;
+                that.headerData[0].ascending = false;
+                that.attachSortHandlers();
+                that.headerData[0].sorted = false;
             }
-            else{
-                d3.select(this).classed("sorting",false)
-                d3.select(this).select(".fas").classed("no-display",true).classed("fa-sort-down",false)
-                clickNumState = 0;
-            }
+            that.headerData[1].sorted = that.headerData[2].sorted = false;
+            that.headerData[1].ascending = that.headerData[2].ascending= false;
+            winCol.classed("sorting",false)
+            winCol.select(".fas").classed("no-display",true).classed("fa-sort-down",false)            
+            predCol.classed("sorting",false)
+            predCol.select(".fas").classed("no-display",true).classed("fa-sort-down",false)
         })
         
         predCol.on("click", function(d,i){
-            if(clickNumPred == 0){
+            if(that.headerData[1].sorted === false && that.headerData[1].ascending === false){
                 d3.select(this).classed("sorting",true)
                 d3.select(this).select(".fas").classed("no-display",false).classed("fa-sort-up",true)
-                clickNumWin = 0;
-                winCol.classed("sorting",false)
-                winCol.select(".fas").classed("no-display",true).classed("fa-sort-down",false)
-                clickNumState = 0;
-                stateCol.classed("sorting",false)
-                stateCol.select(".fas").classed("no-display",true).classed("fa-sort-down",false)
-                clickNumPred = clickNumPred+1;
+                that.headerData[1].sorted = true;
+                that.headerData[1].ascending = true;
+                that.attachSortHandlers();
             }   
-            else if(clickNumPred == 1){
+            else if(that.headerData[1].sorted === true && that.headerData[1].ascending === true){
                 d3.select(this).select(".fas").classed("fa-sort-up",false).classed("fa-sort-down",true)
-                clickNumPred = clickNumPred+1;
+                that.headerData[1].ascending = false;
+                that.attachSortHandlers();
+                that.headerData[1].sorted = false;
             }
-            else{
-                d3.select(this).classed("sorting",false)
-                d3.select(this).select(".fas").classed("no-display",true).classed("fa-sort-down",false)
-                clickNumPred = 0;
-            }
-            // that.attachSortHandlers();
+            that.headerData[0].sorted = that.headerData[2].sorted = false;
+            that.headerData[0].ascending = that.headerData[2].ascending= false;
+            stateCol.classed("sorting",false)
+            stateCol.select(".fas").classed("no-display",true).classed("fa-sort-down",false)            
+            winCol.classed("sorting",false)
+            winCol.select(".fas").classed("no-display",true).classed("fa-sort-down",false)
         })
 
         winCol.on("click", function(d,i){
-            if(clickNumWin == 0){
+            if(that.headerData[2].sorted === false && that.headerData[2].ascending === false){
                 d3.select(this).classed("sorting",true)
                 d3.select(this).select(".fas").classed("no-display",false).classed("fa-sort-up",true)
-                clickNumState = 0;
-                stateCol.classed("sorting",false)
-                stateCol.select(".fas").classed("no-display",true).classed("fa-sort-down",false)
-                clickNumPred = 0;
-                predCol.classed("sorting",false)
-                predCol.select(".fas").classed("no-display",true).classed("fa-sort-down",false)
-                clickNumWin = clickNumWin+1;
+                that.headerData[2].sorted = true;
+                that.headerData[2].ascending = true;
+                that.attachSortHandlers();
+                
             }   
-            else if(clickNumWin == 1){
+            else if(that.headerData[2].sorted === true && that.headerData[2].ascending === true){
                 d3.select(this).select(".fas").classed("fa-sort-up",false).classed("fa-sort-down",true)
-                clickNumWin = clickNumWin+1;
+                that.headerData[2].ascending = false;
+                that.attachSortHandlers();
+                that.headerData[2].sorted = false;
             }
-            else{
-                d3.select(this).classed("sorting",false)
-                d3.select(this).select(".fas").classed("no-display",true).classed("fa-sort-down",false)
-                clickNumWin = 0;
-            }
+            that.headerData[0].sorted = that.headerData[1].sorted = false;
+            that.headerData[0].ascending = that.headerData[1].ascending= false;
+            stateCol.classed("sorting",false)
+            stateCol.select(".fas").classed("no-display",true).classed("fa-sort-down",false)
+            predCol.classed("sorting",false)
+            predCol.select(".fas").classed("no-display",true).classed("fa-sort-down",false)
         })
 
     }
@@ -295,13 +291,6 @@ class Table {
 
         // Container select is using grouperSelect which selects the group that has been appended to the SVG of each row
         // Ticks are defining location of where gridlines should be
-
-        // containerSelect.data(ticks)
-        //     .enter().append("rect")
-        //     .attr("x", d => this.scaleX(d))
-        //     .attr("height",this.vizHeight)
-        //     .attr("width", 1)
-        //     .attr("fill","gray");
 
         for(let i = 0; i < ticks.length; i++){
             containerSelect.append("rect")
@@ -410,7 +399,7 @@ class Table {
 
     }
 
-    attachSortHandlers() 
+    attachSortHandlers(stateSort,predSort,winSort) 
     {
         ////////////
         // PART 7 // 
@@ -419,32 +408,48 @@ class Table {
          * Attach click handlers to all the th elements inside the columnHeaders row.
          * The handler should sort based on that column and alternate between ascending/descending.
          */
+        this.collapseAll();
+
         let that = this;
-
-        let stateCol = d3.selectAll(".sortable").filter((d,i) => i === 0);
-        let predCol = d3.selectAll(".sortable").filter((d,i) => i === 1);
-        let winCol = d3.selectAll(".sortable").filter((d,i) => i === 2);
-
-        let clickNumState = 0;
-        let predSort = 0;
-        let clickNumWin = 0;
-
         
-        // predCol.on("click", function(d,i){
-        //     if(predSort == 0){
-        //         predSort = predSort+1;
-        //     }   
-        //     else if(predSort == 1){
-        //         predSort = predSort+1;
-        //     }
-        //     else{
-        //         predSort = 0;
-        //     }
-        //     let tDS = that.tableData.slice().sort((a,b) => d3.ascending(a.margin,b.margin))
-        //    console.log("original",that.tableData[1],that.tableData[4])
-        //    console.log("sorted",tDS)
-        //    console.log("header", that.headerData[1],that.tableData[4])
-        // })
+        if(that.headerData[0].sorted === true && that.headerData[0].ascending === true){
+            let stateAsc = that.tableData.slice().sort((a,b) => 
+                    d3.ascending(a.state,b.state));
+            that.tableData = stateAsc;
+            that.drawTable()
+        }   
+        else if(that.headerData[0].sorted === true && that.headerData[0].ascending === false){
+            let stateDesc = that.tableData.slice().sort((a,b) => 
+                    d3.descending(a.state,b.state));
+            that.tableData = stateDesc;
+            that.drawTable()
+        }
+
+        if(that.headerData[1].sorted === true && that.headerData[1].ascending === true){
+            let predAsc = that.tableData.slice().sort((a,b) => 
+                    d3.ascending(Math.abs(a.margin),Math.abs(b.margin)));
+            that.tableData = predAsc;
+            that.drawTable()
+        }   
+        else if(that.headerData[1].sorted === true && that.headerData[1].ascending === false){
+            let predDesc = that.tableData.slice().sort((a,b) => 
+                    d3.descending(Math.abs(a.margin),Math.abs(b.margin)));
+            that.tableData = predDesc;
+            that.drawTable()
+        }
+
+        if(that.headerData[2].sorted === true && that.headerData[2].ascending === true){
+            let winAsc = that.tableData.slice().sort((a,b) => 
+                    d3.ascending(+a.winstate_inc,+b.winstate_inc));
+            that.tableData = winAsc;
+            that.drawTable()
+        }   
+        else if(that.headerData[2].sorted === true && that.headerData[2].ascending === false){
+            let winDesc = that.tableData.slice().sort((a,b) => 
+                    d3.descending(+a.winstate_inc,+b.winstate_inc));
+            that.tableData = winDesc;
+            that.drawTable()
+        }
     }
 
 
@@ -455,6 +460,16 @@ class Table {
         /**
          * Update table data with the poll data and redraw the table.
          */
+
+        let stateName = rowData.state;
+        let statePolls = this.pollData.get(stateName);
+        // let pollRow = d3.select('#predictionTableBody').selectAll("tr").filter((d,i) => i === index);
+        // for(let i = 0; i < 5; i++){
+        //     pollRow.append("tr").append("td")
+        // }
+        console.log("row data is ",rowData,"index is",index)
+        console.log(statePolls)
+        // console.log(pollRow)
 
     }
 

@@ -69,7 +69,6 @@ class Table {
            
         legendSelect.append("rect")
             .attr("x", (3*this.vizWidth/6))
-            // .attr("y",this.vizHeight)
             .attr("height", this.vizHeight)
             .attr("width", 1);
 
@@ -132,21 +131,13 @@ class Table {
         this.addCircles(grouperSelect.filter((d,i) => i === 2));
 
         // portion that I have coded
-            // console.log("tableData", this.tableData)
-            // console.log("forecast-selection", forecastSelection)
-        
-        // first should filter this selection to include only the cells of type text - skip over SVG cell in middle column
-        // text should be set based on the data - look carefully in rowToCellDataTransform function to determine how
-        // to find the data you need - filter selection based on data? - use d3.selection filter
 
         // forecastSelection has this.rowToCellDataTransform of this.tableData bound to it - this transforms the data and assigns
         // it cell by cell so all that needs be done is append the text - its even formated
         let textSelect = forecastSelection.filter(d => d.type === "text");
             textSelect.join("text")
                 .text(d => d.value)
-        
-        
-        
+                
         
     }
 
@@ -211,12 +202,20 @@ class Table {
         let winCol = d3.selectAll(".sortable").filter((d,i) => i === 2);
 
         stateCol.on("click", function(d,i){
+
+            that.headerData[1].sorted = that.headerData[2].sorted = false;
+            that.headerData[1].ascending = that.headerData[2].ascending= false;
+            winCol.classed("sorting",false)
+            winCol.select(".fas").classed("no-display",true).classed("fa-sort-down",false)            
+            predCol.classed("sorting",false)
+            predCol.select(".fas").classed("no-display",true).classed("fa-sort-down",false)
+
             if(that.headerData[0].sorted === false && that.headerData[0].ascending === false){
-                d3.select(this).classed("sorting",true)
-                d3.select(this).select(".fas").classed("no-display",false).classed("fa-sort-up",true)
-                that.headerData[0].sorted = true;
-                that.headerData[0].ascending = true;
-                that.attachSortHandlers();
+                    d3.select(this).classed("sorting",true)
+                    d3.select(this).select(".fas").classed("no-display",false).classed("fa-sort-up",true)
+                    that.headerData[0].sorted = true;
+                    that.headerData[0].ascending = true;
+                    that.attachSortHandlers();
             }   
             else if(that.headerData[0].sorted === true && that.headerData[0].ascending === true){
                 d3.select(this).select(".fas").classed("fa-sort-up",false).classed("fa-sort-down",true)
@@ -224,15 +223,17 @@ class Table {
                 that.attachSortHandlers();
                 that.headerData[0].sorted = false;
             }
-            that.headerData[1].sorted = that.headerData[2].sorted = false;
-            that.headerData[1].ascending = that.headerData[2].ascending= false;
-            winCol.classed("sorting",false)
-            winCol.select(".fas").classed("no-display",true).classed("fa-sort-down",false)            
-            predCol.classed("sorting",false)
-            predCol.select(".fas").classed("no-display",true).classed("fa-sort-down",false)
         })
         
         predCol.on("click", function(d,i){
+
+            that.headerData[0].sorted = that.headerData[2].sorted = false;
+            that.headerData[0].ascending = that.headerData[2].ascending= false;
+            stateCol.classed("sorting",false)
+            stateCol.select(".fas").classed("no-display",true).classed("fa-sort-down",false)            
+            winCol.classed("sorting",false)
+            winCol.select(".fas").classed("no-display",true).classed("fa-sort-down",false)
+
             if(that.headerData[1].sorted === false && that.headerData[1].ascending === false){
                 d3.select(this).classed("sorting",true)
                 d3.select(this).select(".fas").classed("no-display",false).classed("fa-sort-up",true)
@@ -246,15 +247,17 @@ class Table {
                 that.attachSortHandlers();
                 that.headerData[1].sorted = false;
             }
-            that.headerData[0].sorted = that.headerData[2].sorted = false;
-            that.headerData[0].ascending = that.headerData[2].ascending= false;
-            stateCol.classed("sorting",false)
-            stateCol.select(".fas").classed("no-display",true).classed("fa-sort-down",false)            
-            winCol.classed("sorting",false)
-            winCol.select(".fas").classed("no-display",true).classed("fa-sort-down",false)
         })
 
         winCol.on("click", function(d,i){
+
+            that.headerData[0].sorted = that.headerData[1].sorted = false;
+            that.headerData[0].ascending = that.headerData[1].ascending= false;
+            stateCol.classed("sorting",false)
+            stateCol.select(".fas").classed("no-display",true).classed("fa-sort-down",false)
+            predCol.classed("sorting",false)
+            predCol.select(".fas").classed("no-display",true).classed("fa-sort-down",false)
+
             if(that.headerData[2].sorted === false && that.headerData[2].ascending === false){
                 d3.select(this).classed("sorting",true)
                 d3.select(this).select(".fas").classed("no-display",false).classed("fa-sort-up",true)
@@ -269,12 +272,6 @@ class Table {
                 that.attachSortHandlers();
                 that.headerData[2].sorted = false;
             }
-            that.headerData[0].sorted = that.headerData[1].sorted = false;
-            that.headerData[0].ascending = that.headerData[1].ascending= false;
-            stateCol.classed("sorting",false)
-            stateCol.select(".fas").classed("no-display",true).classed("fa-sort-down",false)
-            predCol.classed("sorting",false)
-            predCol.select(".fas").classed("no-display",true).classed("fa-sort-down",false)
         })
 
     }
@@ -311,8 +308,10 @@ class Table {
          */
 
         let that = this
-
-        containerSelect.selectAll("rect").data(d => [d.value])
+        containerSelect.filter(d => d.isForecast === false).selectAll("rect").data(d => [d])
+            .join("rect")
+            .attr("width",0)
+        containerSelect.filter(d => d.isForecast === true).selectAll("rect").data(d => [d.value])
             .join("rect")
             .attr("x", function(d) {
                 if((d.marginLow && d.marginHigh <= 0)||(d.marginHigh && d.marginLow >=0)){
@@ -344,8 +343,7 @@ class Table {
                 else{
                     return "margin-bar trump"
                 }
-        })
-           
+        });    
         containerSelect.data(d => [d.value])
             .append("rect")
             .attr("x", function(d) {
@@ -366,7 +364,7 @@ class Table {
                 else{
                     return "no-display"
                 }
-            })
+            });
         
 
     }
@@ -378,8 +376,7 @@ class Table {
         /**
          * add circles to the vizualizations
          */
-
-        containerSelect.filter(d => d.isForecast === undefined).selectAll("circle").data(d => [d])
+        containerSelect.filter(d => d.isForecast === false).selectAll("circle").data(d => [d])
             .join("circle")
             .attr("cx", d => this.scaleX(d.value.margin))
             .attr("cy", this.smallVizHeight/2)
@@ -393,7 +390,7 @@ class Table {
                 }
             });
 
-        containerSelect.filter(d => d.isForecast === true).selectAll("circle").data(d => [d])
+        containerSelect.filter(d => d.isForecast).selectAll("circle").data(d => [d])
             .join("circle")
             .attr("cx", d => this.scaleX(d.value.margin))
             .attr("cy", this.vizHeight/2)
@@ -408,7 +405,7 @@ class Table {
             });
     }
 
-    attachSortHandlers(stateSort,predSort,winSort) 
+    attachSortHandlers() 
     {
         ////////////
         // PART 7 // 
@@ -422,41 +419,35 @@ class Table {
         let that = this;
         
         if(that.headerData[0].sorted === true && that.headerData[0].ascending === true){
-            let stateAsc = that.tableData.slice().sort((a,b) => 
+            that.tableData.sort((a,b) => 
                     d3.ascending(a.state,b.state));
-            that.tableData = stateAsc;
             that.drawTable()
         }   
         else if(that.headerData[0].sorted === true && that.headerData[0].ascending === false){
-            let stateDesc = that.tableData.slice().sort((a,b) => 
+            that.tableData.sort((a,b) => 
                     d3.descending(a.state,b.state));
-            that.tableData = stateDesc;
             that.drawTable()
         }
 
         if(that.headerData[1].sorted === true && that.headerData[1].ascending === true){
-            let predAsc = that.tableData.slice().sort((a,b) => 
+            that.tableData.sort((a,b) => 
                     d3.ascending(Math.abs(a.margin),Math.abs(b.margin)));
-            that.tableData = predAsc;
             that.drawTable()
         }   
         else if(that.headerData[1].sorted === true && that.headerData[1].ascending === false){
-            let predDesc = that.tableData.slice().sort((a,b) => 
+            that.tableData.sort((a,b) => 
                     d3.descending(Math.abs(a.margin),Math.abs(b.margin)));
-            that.tableData = predDesc;
             that.drawTable()
         }
 
         if(that.headerData[2].sorted === true && that.headerData[2].ascending === true){
-            let winAsc = that.tableData.slice().sort((a,b) => 
+            that.tableData.sort((a,b) => 
                     d3.ascending(+a.winstate_inc,+b.winstate_inc));
-            that.tableData = winAsc;
             that.drawTable()
         }   
         else if(that.headerData[2].sorted === true && that.headerData[2].ascending === false){
-            let winDesc = that.tableData.slice().sort((a,b) => 
+            that.tableData.sort((a,b) => 
                     d3.descending(+a.winstate_inc,+b.winstate_inc));
-            that.tableData = winDesc;
             that.drawTable()
         }
     }
@@ -469,26 +460,35 @@ class Table {
         /**
          * Update table data with the poll data and redraw the table.
          */
-        this.tableData[index].isExpanded = true;
-        let stateName = rowData.state;
-        let statePolls = this.pollData.get(stateName);
-        
-        for(let i = 0; i < statePolls.length; i++){
-            this.tableData.push(statePolls[i]);
+        let that = this;
+
+        if(rowData.isExpanded === true){
+            this.tableData = this.tableData.filter(d => d.state !== rowData.state);
+            this.tableData.splice(index,0,rowData)
+            this.drawTable();
+            this.tableData[index].isExpanded = false;
         }
-        
-        let stateDescPoll = this.tableData.slice().sort((a,b) => 
-                    d3.descending(a.state,b.state));
-            this.tableData = stateDescPoll;
-
-        this.drawTable();
-
-        // console.log(statePolls[2])
-        // console.log(this.tableData)
-        // console.log(newData)
-
-        // might be useful to write a sorting function that give like a counter for each cell that matches the state w/state at lowest
-        // and then give all other states zeros? maybe then it will not disturb them and just sort polls to be near state
+        else if(rowData.isExpanded === false){
+            this.tableData[index].isExpanded = true;
+            let stateName = rowData.state;
+            let statePolls = this.pollData.get(stateName);
+            // let newTable = [];
+            // for(let i = 0; i <= index; i++){
+            //     newTable[i] = this.tableData[i];
+            // }
+            // for(let i = 0; i < statePolls.length; i++){
+            //     newTable[index+1+i] = statePolls[i];
+            // }
+            // for(let i = index + 1; i < this.tableData.length; i++){
+            //     newTable[statePolls.length + i] = this.tableData[i];
+            // }
+            // this.tableData = newTable;
+            for(let i = 0; i < statePolls.length; i++){
+                this.tableData.splice(index+1+i,0,statePolls[i]);
+                this.tableData[index+i+1].isForecast = false;
+            }
+            this.drawTable();
+        }
 
     }
 

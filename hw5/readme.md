@@ -79,6 +79,7 @@ Column | Description
 `state` | Name of the state
 `pollster` | Name of organization that conducted the poll.
 `poll_id` | ID for a given poll. (responses for each candidate is on a separate row, so this attribute links them together.)
+`question_id` | ID for a given question.  (needed to distinguish between multiple questions on the same poll)
 `pct` | the polled prediction for the given candidate.
 `answer` | the candidate chosen in the poll (e.g. Trump or Biden)
 

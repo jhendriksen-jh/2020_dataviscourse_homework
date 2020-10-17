@@ -190,7 +190,7 @@ class Table {
 
     updateHeaders() {
         ////////////
-        // PART 6 // 
+        // PART 7 // 
         ////////////
         /**
          * update the column headers based on the sort state
@@ -408,7 +408,7 @@ class Table {
     attachSortHandlers() 
     {
         ////////////
-        // PART 7 // 
+        // PART 6 // 
         ////////////
         /**
          * Attach click handlers to all the th elements inside the columnHeaders row.

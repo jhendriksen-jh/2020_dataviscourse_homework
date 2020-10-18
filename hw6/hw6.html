@@ -7,6 +7,10 @@
     <script src="https://d3js.org/d3.v5.js"></script>
     <script src="https://d3js.org/d3-array.v2.min.js"></script>
     <script src="https://d3js.org/d3-force.v2.min.js"></script>
+    <script src="js/script.js"></script>
+    <script src="js/table.js"></script>
+    <script src="js/bubble.js"></script>
+    <link rel="stylesheet" href="styles.css"/>
     <link href="https://fonts.googleapis.com/css?family=Work+Sans:400,700&display=swap" rel="stylesheet">
     <!-- 
        Bootstrap styling if you want to use it: 
@@ -18,8 +22,36 @@
     <div id="header-wrap">
         <header>
             <h1>The State of the State of the States</h1>
-            <div>Name: YOURNAME; E-Mail: YOUREMAIL; UID: u0123456</div>
+            <div>Name: Jordan Hendriksen; E-Mail: jordan.hendriksen@utah.edu; UID: u1063288 </div>
         </header>
+        <label class="switch" id = "toggle-switch">
+            <input type="checkbox">
+            <span class="slider"></span>
+        </label>
+    </div>
+    <div class = "wrapper">
+        <div style="float: left; width: 50%" id = "bubble-chart"></div>
+        <div style="float: left; width: 50%" class = "table-div">
+            <table id = "phraseTable">
+                <thead>
+                    <tr id = "headers">
+                        <th class = "sortable">Phrase</th>
+                        <th class = "sortable">Frequency</th>
+                        <th class = "sortable">Percentage</th>
+                        <th class = "sortable">Total</th>
+                    </tr>
+                    <tr class = header-row>
+                        <td class = header-row></td>
+                        <td class = header-row><svg id = "freq-col"></svg></td>
+                        <td class = header-row><svg id = "perc-col"></svg></td>
+                        <td class = header-row></td>
+                    </tr>
+                </thead>
+                <tbody id = "phrase-table-body">
+
+                </tbody>
+            </table>
+        </div>
     </div>
 </body>
 

@@ -55,6 +55,39 @@ td:last-of-type
 #perc-col{
     height: 20px;
 }
+.dem{
+  fill: steelblue;
+  stroke: white;
+}
+.rep{
+  fill: firebrick;
+  stroke: white;
+}
+.chart-label{
+  fill: darkgray;
+}
+.no-select{
+  fill: gray;
+  stroke: darkgray;
+  opacity: 0.5;
+}
+.axis path,
+.axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+}
+.axis-label {
+  font-size: 11px;
+}
+.a-label,
+.x-label,
+.c-label {
+    width: 1%7;
+    display: inline-block;
+    float: left;
+    padding-right: 5px;
+}
 
 /* switch styling */
 .switch {

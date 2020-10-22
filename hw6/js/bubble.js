@@ -88,8 +88,12 @@ class BubblePlot {
         axisG.selectAll("text").data(axisVal).text(d=> ""+d)
 
         this.addExpLabels();
+        this.addToolTips();
         this.toggleExpand();
         this.bubbleBrushing();
+        this.showExtremes();
+        
+
     }
 
     addBubbles(selection,category,groupNum){
@@ -149,6 +153,27 @@ class BubblePlot {
                     .attr("cy", d => that.scaleY(d.yVal));
                 that.expansion = false;
             }
+        })
+    }
+
+    addToolTips(){
+        let circleSelect = d3.select("#bubble-svg").selectAll("circle");
+        circleSelect.on("mouseover",function(d){
+            console.log(d)
+            d3.select(".wrapper").append("div").selectAll("text").data(d).join("text").text(d => d.phrase);
+        })
+    }
+
+    showExtremes(){
+        let extSelect = d3.select("#extremes-button");
+        extSelect.on("click",function(){
+            let wrapSelect = d3.select(".wrapper");
+            wrapSelect.append("div").attr("class","extremes-dim");
+            let dimSelect = d3.select(".extremes-dim");
+            // dimSelect.append("svg").attr("class","extremes-svg")
+            //     .attr("width",this.width).attr("height",this.height).attr("y",-500);
+            // let svgSelect = d3.select(".extremes-svg")
+            // svgSelect.append("rect").attr("width",100).attr("height",100)
         })
     }
 

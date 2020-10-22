@@ -89,6 +89,23 @@ td:last-of-type
     padding-right: 5px;
 }
 
+.wrapper{
+  height: 100vh;
+  width: 100vw;
+}
+
+.extremes-dim{
+  background-color: black;
+  opacity: 0.5;
+  height: 100vh;
+  width: 100vw;
+}
+.extremes-svg{
+  /* bottom: 100vh;
+  right: 100vw; */
+}
+
+
 /* switch styling */
 .switch {
     position: relative;

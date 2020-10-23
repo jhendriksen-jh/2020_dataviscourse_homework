@@ -1,12 +1,13 @@
-// wordsData = d3.json('.data/words.json');
+// wordsData = d3.json('.data/words.json')
 Promise.all([d3.json('./data/words.json')]).then( data =>
     {
-        function updateTable(selectedInd,catInd){
+        // console.log(data)
+        function updateTable(selectedInd,catInd,expansion){
             if(selectedInd.length == 0){
-                table.clearFilter();
+                table.clearSelection();
             }
             else{
-                table.filterTable(selectedInd,catInd);
+                table.filterTable(selectedInd,catInd,expansion);
             }
         }
 
@@ -15,10 +16,6 @@ Promise.all([d3.json('./data/words.json')]).then( data =>
 
         table.drawTable();
         bubble.drawBubbles();
-
-        document.addEventListener("click", function (e) {
-            table.clearFilter();
-        }, true);
 
     });
 

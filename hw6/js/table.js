@@ -238,22 +238,38 @@ class Table{
         })        
     }
 
-    filterTable(selectedInd,catInd){
+    filterTable(selectedInd,catInd,expansion){
         this.tableData = this.tableRenew;
         let that = this;
         let brushData = [... this.tableData];
-        brushData = brushData.filter(d=>d.category === that.catList[catInd]);
-        if(selectedInd.length>0){
-            this.tableData = brushData.filter((_,i) => {
-                return selectedInd.includes(i);
-            })
+        if(expansion === true){
+            brushData = brushData.filter(d=>d.category === that.catList[catInd]);
+            if(selectedInd.length>0){
+                this.tableData = brushData.filter((_,i) => {
+                    return selectedInd.includes(i);
+                })
+            }
+        }
+        else if(expansion === false){
+            let brushDataGroup = [];
+            let dataGroup = [];
+            for(let i = 0; i < that.catList.length; i++){
+                dataGroup[i] = brushData.filter(d => d.category == that.catList[i]);
+            }
+            brushDataGroup = [].concat(dataGroup[0],dataGroup[1],dataGroup[2],dataGroup[3],dataGroup[4],dataGroup[5]);
+            if(selectedInd.length>0){
+                this.tableData = brushDataGroup.filter((_,i) => {
+                    return selectedInd.includes(i);
+                })
+            }
         }
         this.drawTable();
     }
 
-    clearFilter(){
+    clearSelection(){
         this.tableData = this.tableRenew;
         this.drawTable();
+        d3.select("#bubble-svg").selectAll("circle").classed("no-select",false);
     }
 
 }

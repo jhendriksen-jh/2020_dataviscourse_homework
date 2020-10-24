@@ -12,27 +12,24 @@
     <script src="js/bubble.js"></script>
     <link rel="stylesheet" href="styles.css"/>
     <link href="https://fonts.googleapis.com/css?family=Work+Sans:400,700&display=swap" rel="stylesheet">
-    <!-- 
-       Bootstrap styling if you want to use it: 
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">-->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
 </head>
 
 <body>
-    <div id="header-wrap">
-        <header>
-            <h1>The State of the State of the States</h1>
-            <div>Name: Jordan Hendriksen; E-Mail: jordan.hendriksen@utah.edu; UID: u1063288 </div>
-        </header>
+    <div class = "wrapper">
+        <div id="header-wrap">
+            <header>
+                <h1>The State of the State of the States</h1>
+                <div>Name: Jordan Hendriksen; E-Mail: jordan.hendriksen@utah.edu; UID: u1063288 </div>
+            </header>
+        </div>
         <label class="switch" id = "toggle-switch">
             <input type="checkbox">
             <span class="slider"></span>
         </label>
         <button type="button" id = "extremes-button">Show Extremes</button>
-    </div>
-    <div class = "wrapper">
-        <div style="float: left; width: 50%" id = "bubble-chart"></div>
-        <div style="float: left; width: 50%" class = "table-div">
+        <div style="float: left; width: 55%" id = "bubble-chart"></div>
+        <div style="float: left; width: 30%" class = "table-div">
             <table id = "phraseTable">
                 <thead>
                     <tr id = "headers">
@@ -43,8 +40,8 @@
                     </tr>
                     <tr class = header-row>
                         <td class = header-row></td>
-                        <td class = header-row><svg id = "freq-col"></svg></td>
-                        <td class = header-row><svg id = "perc-col"></svg></td>
+                        <td class = "header-row freq-col"></td>
+                        <td class = "header-row perc-col"></td>
                         <td class = header-row></td>
                     </tr>
                 </thead>

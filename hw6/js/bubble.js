@@ -24,9 +24,10 @@ class BubbleData {
 
 class BubblePlot {
 
-    constructor(data, updateTable){
+    constructor(data, updateTable, toggleClearFilter){
         this.data = data[0];
         this.updateTable = updateTable;
+        this.toggleClearFilter = toggleClearFilter;
         this.bubbleData = [];
         let circleTotal = [];
         let catList = [];
@@ -51,7 +52,6 @@ class BubblePlot {
         this.scaleSize = d3.scaleSqrt()
             .domain([d3.min(circleTotal), d3.max(circleTotal)])
             .range([3,12]);
-
         this.catList = [...new Set(catList)];
 
         let catData = [];
@@ -92,9 +92,10 @@ class BubblePlot {
 
         this.expansion = false;
         this.extremes = false;
-        this.height = 200*this.catList.length;
-        this.width = 600;
+        this.height = 185*this.catList.length;
+        this.width = 750;
         this.margin = 25;
+        this.yTranslate = 40;
 
         this.scaleColor = d3.scaleOrdinal()
             .domain(this.catList)
@@ -102,7 +103,7 @@ class BubblePlot {
 
         this.scaleX = d3.scaleLinear()
             .domain([d3.min(xlist), d3.max(xlist)])
-            .range([this.margin,this.width-this.margin]);
+            .range([this.margin,this.width-3*this.margin]);
         this.scaleY = d3.scaleLinear()
             .domain([d3.min(ylist), d3.max(ylist)])
             .range([this.margin,(this.height/this.catList.length)-this.margin]);     
@@ -110,37 +111,30 @@ class BubblePlot {
     }
 
     drawBubbles(){
-        this.bubbleBrushing();
-
         d3.select("#bubble-chart").append("svg").attr("id","bubble-svg")
             .attr("width",this.width).attr("height",this.height);
+        
+        this.addAxis();
+
         d3.select("#bubble-svg").append("g").attr("id","mainGroup")
         let bubbleSVGgroups = d3.select("#mainGroup").selectAll("g");
         bubbleSVGgroups.data(this.catList).join("g")
             .attr("id", (d,i) => "bubble-group-"+i)
             .attr("class","bubbleGroups")
             .attr("fill","none")
-            .attr("transform",(d,i) =>"translate(0,"+(this.margin+(i*200))+")");
+            .attr("transform",(d,i) =>"translate(0,"+(this.yTranslate+(i*185))+")");
+
+        this.bubbleBrushing();
+
         for(let i = 0; i < this.catList.length; i++){
             let drawGroup = d3.select("#bubble-group-"+i);
             this.addBubbles(drawGroup,this.catList[i],i);
         }
-        
-        let axisVal = [60,50,40,30,20,10,0,10,20,30,40,50];
 
-    
-        let bubbleAxis = d3.axisTop(this.scaleX).ticks(11);
-        let axisG = d3.select("#bubble-svg").append("g").attr("id","bubble-axis").attr("class","axis");
-        axisG.call(bubbleAxis)
-            .attr("transform","translate(0,"+this.margin+")");
-        axisG.selectAll("text").data(axisVal).text(d=> ""+d)
-
-        this.addCatLabels();
-        this.addToolTips();
         this.showExtremes();
+        this.addCatLabels();
         this.toggleExpand();
-
-
+        this.addToolTips();
     }
 
     addBubbles(selection,category,groupNum){
@@ -152,7 +146,7 @@ class BubblePlot {
             .attr("r", d => this.scaleSize(d.total))
             .attr("fill", d => this.scaleColor(d.category))
             .attr("cx", d => this.scaleX(d.xVal))
-            .attr("cy", d => this.scaleY(d.yVal+this.margin))
+            .attr("cy", d => this.scaleY(d.yVal+this.yTranslate))
             .attr("stroke", "black")
             .attr("class","bubbles")
             .attr("id",function(d){
@@ -163,7 +157,36 @@ class BubblePlot {
                     return 
                 }
             })
-            .attr("transform","translate(0,"+(-this.margin+(groupNum*-200))+")");
+            .attr("transform","translate(0,"+(-this.yTranslate+(groupNum*-185))+")");
+    }
+
+    addAxis(){
+        let axisScale = d3.scaleLinear()
+            .domain([-this.extrema[1].ratioDem,this.extrema[2].ratioRep])
+            .range([this.margin,this.width-this.margin])
+            .nice();
+    
+        let bubbleAxis = d3.axisBottom(axisScale).ticks(10).tickFormat(d => Math.abs(d));
+        let axisG = d3.select("#bubble-svg").append("g").attr("id","bubble-axis").attr("class","axis");
+        axisG.call(bubbleAxis)
+            .attr("transform","translate(0,"+this.yTranslate+")");
+
+        let axisSVG = d3.select("#bubble-svg")
+        axisSVG.append("text")
+            .attr("transform","translate(10,"+this.yTranslate/2+")")
+            .attr("class","leaning-label")
+            .attr("text-anchor","start")
+            .text("Democratic Leaning");
+        axisSVG.append("text")
+            .attr("transform","translate("+(this.width-10)+","+this.yTranslate/2+")")
+            .attr("class","leaning-label")
+            .attr("text-anchor","end")
+            .text("Republican Leaning");
+        axisSVG.append("rect")
+            .attr("class","midline")
+            .attr("transform","translate(343.18,"+(this.yTranslate+20)+")")
+            .attr("height",(this.height/this.catList.length))
+            .attr("width",1);
     }
 
     addCatLabels(){
@@ -172,29 +195,40 @@ class BubblePlot {
             .join("text")
             .text(d => ""+d)
             .attr("class", "chart-label")
-            .attr("y", (d,i) => 2*this.margin + i*185)
+            .attr("y", (d,i) => this.yTranslate+i*165)
             .attr("opacity",0);
+        d3.select("#labels-group").attr("transform","translate(0,"+this.yTranslate+")")
     }
 
     toggleExpand(){
         let that = this;
-
+        d3.select(".wrapper").append("div").attr("id","toggle-label").html("<h2> Grouped by Topic</h2>");
         let toggleSelect = d3.select("#bubble-svg").selectAll("circle");
-        let labelSelect= d3.select("#labels-group").selectAll("text");
+        let labelSelect = d3.select("#labels-group").selectAll("text");
+        let midSelect = d3.select(".midline");
 
         let toggleSwitch = d3.select("#toggle-switch");
         toggleSwitch.on("change",function(){
+            
+            d3.selectAll(".bubbleGroups").classed("brush",true).call(d3.brushX().extent([[0,0],[this.width,this.height/6]]).move,null);
+            toggleSelect.classed("no-select",false);
+            that.toggleClearFilter();
+
             if(that.expansion === false){
                 toggleSelect
                     .transition()
                     .duration(1000)
                     .attr("cx", d => that.scaleX(d.xEx))
-                    .attr("cy", d => that.scaleY(d.yEx+that.margin));
+                    .attr("cy", d => that.scaleY(d.yEx+that.yTranslate));
                 labelSelect
                     .attr("opacity",0)
                     .transition()
                     .duration(1000)
                     .attr("opacity",1)
+                midSelect
+                    .transition()
+                    .duration(1000)
+                    .attr("height",that.height)
                 that.expansion = true;
             }
             else if(that.expansion === true){
@@ -202,14 +236,18 @@ class BubblePlot {
                     .transition()
                     .duration(1000)
                     .attr("cx", d => that.scaleX(d.xVal))
-                    .attr("cy", d => that.scaleY(d.yVal+that.margin));
+                    .attr("cy", d => that.scaleY(d.yVal+that.yTranslate));
                 labelSelect
                     .transition()
                     .duration(1000)
                     .attr("opacity",0);
+                midSelect
+                    .transition()
+                    .duration(1000)
+                    .attr("height",that.height/that.catList.length)
                 that.expansion = false;
             }
-            if (that.extremes === true){
+            if(that.extremes === true){
                 that.extremes = false;
                 d3.select("#extremes-group").selectAll("div").remove();
                 d3.select(".wrapper").selectAll('*').classed("hidden",false)
@@ -224,19 +262,28 @@ class BubblePlot {
 
         d3.selectAll(".bubbles")
             .on("mouseover",function(d){
+                let hoverCirc = d3.select(this);
+                if(+d.percDem < 0){
+                    hoverCirc.classed("hover rep",true)
+                }
+                else{
+                    hoverCirc.classed("hover dem",true)
+                }
+
                 tooltipDiv.transition().duration(300).style("opacity",0.9);
                 if(d.percDem>0){
                     tooltipDiv.html("<h2>"+d.phrase+"</h2><p>D+ "+d.percDem+"%<br/>In "+d.freq+"% of speeches</p>")
-                        .style("left",(d3.event.pageX)+"px")
-                        .style("top",(d3.event.pageY-40)+"px");
+                        .style("left",(d3.event.pageX+10)+"px")
+                        .style("top",(d3.event.pageY-50)+"px");
                 }
                 else{
                     tooltipDiv.html("<h2>"+d.phrase+"</h2><p>R+ "+d.percRep+"%<br/>In "+d.freq+"% of speeches</p>")
-                        .style("left",(d3.event.pageX)+"px")
-                        .style("top",(d3.event.pageY-40)+"px");
+                        .style("left",(d3.event.pageX+10)+"px")
+                        .style("top",(d3.event.pageY-50)+"px");
                 }
             })
             .on("mouseout",function(){
+                d3.select(this).classed("hover dem",false).classed("hover rep",false);
                 tooltipDiv.transition().duration(300).style("opacity",0);
             })
     }
@@ -246,19 +293,22 @@ class BubblePlot {
         let extSelect = d3.select("#extremes-button");
         d3.select("body").append("g").attr("id","extremes-group");
         let wrapSelect = d3.select("#extremes-group");
+        let clickShow = false;
 
         extSelect.on("click",function(){
+
+            d3.selectAll(".bubbleGroups").classed("brush",true).call(d3.brushX().extent([[0,0],[this.width,this.height/6]]).move,null);
+            
+
             let coordMax = [];
             let coordMin = [];
-
-            if(that.extremes === false){
-        
-            }
+            let scrollDown = window.pageYOffset || (document.documentElement || document.body.parentNode || document.body).scrollTop;
+            let scrollLeft = window.pageXOffset || (document.documentElement || document.body.parentNode || document.body).scrollLeft;
 
             if(that.expansion === true && that.extremes === false){
                 d3.select("#phraseTable").selectAll("tr").classed("hidden",true);
-                d3.select("#bubble-svg").selectAll("circle").classed("hidden",true);
-                // d3.select("#bubble-svg").selectAll("text").classsed("");
+                d3.select("#bubble-svg").selectAll("circle").classed("hidden",true).classed("no-select",false);
+
                 for(let i = 0; i < that.extrema.length; i++){
                     d3.select("#extreme-"+that.extrema[i].max.substring(0,3)).classed("hidden",false).classed("rep",true);
                     d3.select("#extreme-"+that.extrema[i].min.substring(0,3)).classed("hidden",false).classed("dem",true);
@@ -270,20 +320,20 @@ class BubblePlot {
                 wrapSelect.append("div")
                         .html("<p> Republican mentioned <h2>"+that.extrema[i].max+"</h2> "+that.extrema[i].ratioRep+"% more frequently.")
                         .attr("class","rep extremes-label")
-                        .style("top",""+(coordMax.bottom+25)+"px")
-                        .style("left",""+(coordMax.left)+"px")
+                        .style("top",""+(coordMax.bottom+15+scrollDown)+"px")
+                        .style("left",""+(coordMax.left+scrollLeft)+"px")
                         ;
                 wrapSelect.append("div")
                         .html("<p> Democrats mentioned <h2>"+that.extrema[i].min+"</h2> "+that.extrema[i].ratioDem+"% more frequently.")
                         .attr("class", "dem extremes-label")
-                        .style("top",""+(coordMin.bottom+25)+"px")
-                        .style("left",""+(coordMin.left-25)+"px");
+                        .style("top",""+(coordMin.bottom+15+scrollDown)+"px")
+                        .style("left",""+(coordMin.left-25+scrollLeft)+"px");
                     that.extremes = true;
                 }
             }
             else if(that.expansion === false && that.extremes === false){
                 d3.select("#phraseTable").selectAll("tr").classed("hidden",true);
-                d3.select("#bubble-svg").selectAll("circle").classed("hidden",true);
+                d3.select("#bubble-svg").selectAll("circle").classed("hidden",true).classed("no-select",false);
                 d3.select("#extreme-pri").classed("hidden",false).classed("rep",true);
                 d3.select("#extreme-cli").classed("hidden",false).classed("dem",true);
                 
@@ -295,23 +345,35 @@ class BubblePlot {
                 wrapSelect.append("div")
                         .html("<p> Republican mentioned <h2>"+that.extrema[2].max+"</h2> "+that.extrema[2].ratioRep+"% more frequently.")
                         .attr("class","rep extremes-label")
-                        .style("top",""+(coordMax.bottom+25)+"px")
-                        .style("left",""+(coordMax.left)+"px")
+                        .style("top",""+(coordMax.bottom+15+scrollDown)+"px")
+                        .style("left",""+(coordMax.left+scrollLeft)+"px")
                         ;
                 wrapSelect.append("div")
                         .html("<p> Democrats mentioned <h2>"+that.extrema[1].min+"</h2> "+that.extrema[1].ratioDem+"% more frequently.")
                         .attr("class", "dem extremes-label")
-                        .style("top",""+(coordMin.bottom+25)+"px")
-                        .style("left",""+(coordMin.left-25)+"px");
+                        .style("top",""+(coordMin.bottom+15+scrollDown)+"px")
+                        .style("left",""+(coordMin.left-25+scrollLeft)+"px");
                 that.extremes = true;
             }
             else if (that.extremes === true){
                 that.extremes = false;
                 wrapSelect.selectAll("div").remove();
                 d3.select(".wrapper").selectAll('*').classed("hidden",false)
-                    .selectAll(".bubbles").classed("rep",false).classed("dem",false);
+                    .selectAll(".bubbles").classed("rep",false).classed("dem",false).classed("no-select",false);
             }
         })
+
+        document.addEventListener("click",function(e){
+            if(e.path[0].type !== "button"){
+                if(that.extremes === true){
+                    that.extremes = false;
+                    wrapSelect.selectAll("div").remove();
+                    d3.select(".wrapper").selectAll('*').classed("hidden",false)
+                        .selectAll(".bubbles").classed("rep",false).classed("dem",false).classed("no-select",false); 
+                }
+            }
+        })
+
     }
 
     bubbleBrushing(){
@@ -386,7 +448,6 @@ class BubblePlot {
                 if(selectedIndices.length>0){
                     let allCircs = d3.select("#bubble-svg").selectAll("circle");
                     allCircs.classed("no-select",true);
-                    // selectedCircs.classed("no-select",true);
                     selectedCircs.filter((_,i) => {
                         return selectedIndices.includes(i);
                     })

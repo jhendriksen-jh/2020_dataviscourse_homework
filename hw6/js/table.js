@@ -52,17 +52,20 @@ class Table{
             },
         ]
 
-        this.vizWidth = 100;
-        this.vizHeight = 30;
-        this.smallVizHeight = 15;
+        this.vizWidth = 150;
+        this.smallVizWidth = 130;
+        this.pad = 10;
+        this.vizHeight = 22;
+        this.smallVizHeight = 20;
+        this.axisDrawn = false;
 
         this.scaleF = d3.scaleLinear()
             .domain([0, 1])
-            .range([0, this.vizWidth]);
+            .range([this.pad, this.smallVizWidth]);
 
         this.scaleP = d3.scaleLinear()
             .domain([0,100])
-            .range([0, this.vizWidth/2]);
+            .range([this.pad, (this.smallVizWidth-this.pad)/2]);
 
         let catList = [];
         for(let i = 0; i < this.tableData.length; i++){
@@ -77,6 +80,9 @@ class Table{
     }
 
     drawTable(){
+        d3.select(".freq-col").append("svg").attr("height", this.smallVizHeight).attr("width",this.vizWidth);
+        d3.select(".perc-col").append("svg").attr("height", this.smallVizHeight).attr("width",this.vizWidth);
+
         let rows = d3.select('#phrase-table-body')
             .selectAll('tr')
             .data(this.tableData)
@@ -110,7 +116,8 @@ class Table{
             .data(d =>[d])
             .join("text")
             .text(d => ""+d.total)
-
+        
+        this.addHeaderAxes();
         this.addRectFreq(freqCol);
         this.addRectPerc();
         this.sortTable();
@@ -129,24 +136,40 @@ class Table{
         let dataList = [d.phrase,freqInfo,percInfo,d.total];
         return dataList;
     }
+    addHeaderAxes(){
+        if(this.axisDrawn === false){
+            let freqScale = d3.scaleLinear().domain([0,1]).range([this.pad,this.smallVizWidth+this.pad]).nice();
+            let freqAxis = d3.axisBottom(freqScale).ticks(3);
+            d3.select(".freq-col").selectAll("svg").append("g").attr("class","axis").call(freqAxis)
+                .call(g => g.select(".domain").remove());;
+
+            let percScale = d3.scaleLinear().domain([-100,100]).range([this.pad,this.smallVizWidth+this.pad]).nice();
+            let percAxis = d3.axisBottom(percScale).ticks(5).tickFormat(d => Math.abs(d));
+            d3.select(".perc-col").selectAll("svg").append("g").attr("class","axis").call(percAxis)
+                .call(g => g.select(".domain").remove());
+
+            this.axisDrawn = true;
+        }
+    }
     addRectFreq(svgSelect){
         svgSelect.selectAll("rect").data(d => [d])
             .join("rect")
             .attr("width", d => this.scaleF(d.value))
             .attr("height", this.smallVizHeight)
-            .attr("fill", d => this.scaleColor(d.category));
+            .attr("fill", d => this.scaleColor(d.category))
+            .attr("x", this.pad);
         
     }
     addRectPerc(){
         d3.selectAll(".g0").selectAll("rect").data(d => [d.value])
             .join("rect")
-            .attr("width", d => this.scaleP(d.perc_Dem+1))
+            .attr("width", d => this.scaleP(d.perc_Dem))
             .attr("height", this.smallVizHeight)
-            .attr("x", d => (this.vizWidth/2 - this.scaleP(d.perc_Dem+1)))
+            .attr("x", d => (this.vizWidth/2 - this.scaleP(d.perc_Dem)))
             .attr("class", "dem");
         d3.selectAll(".g1").selectAll("rect").data(d => [d.value])
             .join("rect")
-            .attr("width", d => this.scaleP(d.perc_Rep+1))
+            .attr("width", d => this.scaleP(d.perc_Rep))
             .attr("height", this.smallVizHeight)
             .attr("x", this.vizWidth/2)
             .attr("class", "rep");

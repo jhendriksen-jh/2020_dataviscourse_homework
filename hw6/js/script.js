@@ -11,8 +11,12 @@ Promise.all([d3.json('./data/words.json')]).then( data =>
             }
         }
 
+        function toggleClearFilter(){
+            table.clearSelection();
+        };
+
         let table = new Table(data);
-        let bubble = new BubblePlot(data,updateTable);
+        let bubble = new BubblePlot(data,updateTable,toggleClearFilter);
 
         table.drawTable();
         bubble.drawBubbles();
